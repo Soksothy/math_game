@@ -7,6 +7,7 @@ import 'package:math_game/widgets/number_pad.dart';
 import 'package:math_game/widgets/answer_controls.dart';
 import 'package:math_game/widgets/question_display.dart';
 import 'package:math_game/widgets/question_header.dart';  // Add this import
+import 'package:math_game/widgets/answer_options.dart'; // Add this import
 import 'dart:async';
 import 'package:logger/logger.dart';
 
@@ -17,40 +18,66 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> {
+class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   late BaseGameController gameController;
   int remainingSeconds = 10;  // 10 seconds per question
   int stars = 0;
   bool isAnswerSelected = false;
   String currentInput = '';
   bool? isCorrectAnswer;
-  late Timer _timer;
+  Timer? _timer; // Make timer nullable and remove late
   final logger = Logger();
+  late String gameName; // Add this variable
 
   @override
   void initState() {
     super.initState();
-    // Timer will be initialized in didChangeDependencies
+    WidgetsBinding.instance.addObserver(this);
+    // Initialize timer with a dummy that does nothing
+    _timer = Timer(Duration.zero, () {});
   }
 
+  @override
+  void dispose() {
+    _timer?.cancel(); // Safe cancel in dispose
+    gameController.endGame();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _timer?.cancel(); // Safe cancel
+    } else if (state == AppLifecycleState.resumed) {
+      if (gameController.isGameActive && !isAnswerSelected) {
+        startTimer();
+      }
+    }
+  }
+
+  // Optimize timer management
   void startTimer() {
+    _timer?.cancel(); // Safely cancel existing timer if any
+    
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
       }
-      setState(() {
-        if (remainingSeconds > 0) {
+      
+      if (remainingSeconds > 0) {
+        setState(() {
           remainingSeconds--;
-        } else {
-          timeUp();
-        }
-      });
+        });
+      } else {
+        timeUp();
+      }
     });
   }
 
   void timeUp() {
-    _timer.cancel();
+    _timer?.cancel();
     if (!mounted) return;
     if (!isAnswerSelected) {
       setState(() {
@@ -65,19 +92,29 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  // Optimize state updates
   void moveToNextQuestion() {
     if (!mounted) return;
+    
     if (gameController.nextQuestion()) {
+      // Batch state updates
       setState(() {
         isAnswerSelected = false;
         isCorrectAnswer = null;
         remainingSeconds = 10;
         currentInput = '';
       });
-      logger.d('Moving to next question: ${gameController.getQuestionText()}'); // Debug log
-      startTimer();
+      
+      // Delay timer start slightly to ensure smooth transition
+      Future.microtask(() {
+        if (mounted) {
+          startTimer();
+        }
+      });
     } else {
-      _timer.cancel();
+      if (_timer?.isActive ?? false) {
+        _timer?.cancel();
+      }
       gameController.endGame();
       // Navigate to results screen
     }
@@ -88,7 +125,8 @@ class _GameScreenState extends State<GameScreen> {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final String gameType = args['gameType'];
-    
+    gameName = args['gameName']; // Get the game name
+
     gameController = GameControllerFactory.createController(gameType);
     gameController.startGame();
     startTimer(); // Start timer when game starts
@@ -105,7 +143,7 @@ class _GameScreenState extends State<GameScreen> {
   void submitAnswer() {
     if (isAnswerSelected || currentInput.isEmpty) return;
     
-    _timer.cancel(); // Stop the current timer
+    _timer?.cancel(); // Stop the current timer
     try {
       int answer = int.parse(currentInput);
       logger.d('Question: ${gameController.getQuestionText()}'); // Debug log
@@ -152,6 +190,7 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final UserModel user = args['userModel'];
+    final String gameName = args['gameName'];
 
     return Scaffold(
       appBar: GameTimerBar(
@@ -172,8 +211,8 @@ class _GameScreenState extends State<GameScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   QuestionDisplay(
-                    question: gameController.getQuestionText(), // Use controller method directly
-                    userInput: currentInput,
+                    question: gameController.getQuestionText(),
+                    userInput: gameName == 'Sum Sprint' ? '?' : currentInput,
                     isCorrect: isCorrectAnswer,
                     textStyle: const TextStyle(
                       fontFamily: 'Swiss',
@@ -185,32 +224,55 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  if (gameName == 'Sum Sprint')
+                    AnswerOptions(
+                      options: gameController.getCurrentQuestion().options,
+                      onOptionSelected: handleOptionSelected,
+                      isEnabled: !isAnswerSelected,
+                      optionSize: 80,
+                      rows: 2,
+                    ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
-            AnswerControls(
-              onClear: clearInput,
-              onSubmit: submitAnswer,
-              isEnabled: !isAnswerSelected,
-            ),
-            NumberPad(
-              onNumberSelected: handleAnswer,
-              textStyle: const TextStyle(
-                fontFamily: 'Swiss',
-                fontSize: 32, // Increased font size
+            if (gameName != 'Sum Sprint')
+              AnswerControls(
+                onClear: clearInput,
+                onSubmit: submitAnswer,
+                isEnabled: !isAnswerSelected,
               ),
-            ),
+            if (gameName != 'Sum Sprint')
+              NumberPad(
+                onNumberSelected: handleAnswer,
+                textStyle: const TextStyle(
+                  fontFamily: 'Swiss',
+                  fontSize: 32, // Increased font size
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 
-  @override
-  void dispose() {
-    _timer.cancel();
-    gameController.endGame();
-    super.dispose();
+  void handleOptionSelected(int selectedOption) {
+    if (isAnswerSelected) return;
+
+    _timer?.cancel(); // Stop the current timer
+    bool isCorrect = gameController.checkAnswer(selectedOption);
+
+    setState(() {
+      isAnswerSelected = true;
+      isCorrectAnswer = isCorrect;
+      if (isCorrect) {
+        stars++;
+      }
+    });
+
+    Future.delayed(const Duration(seconds: 1), () {
+      if (!mounted) return;
+      moveToNextQuestion();
+    });
   }
 }

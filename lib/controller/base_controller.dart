@@ -13,6 +13,10 @@ abstract class BaseGameController {
   final logger = Logger();
   int currentQuestionNumber = 1;
 
+  // Add this field at the top with other fields
+  List<int> _options = [];
+  List<int> get options => _options;
+
   // Initialize and start the game
   void startGame() {
     isGameActive = true;
@@ -27,23 +31,28 @@ abstract class BaseGameController {
         numbers: List.from(currentNumbers),
         correctAnswer: correctAnswer,
         operation: getOperationSymbol(),
-        options: generateOptions(),
+        options: generateOptions(correctAnswer),
       ));
     }
     logger.i('Game started with $totalQuestions questions.');
   }
 
-  // Generate 4 options including the correct answer
-  List<int> generateOptions() {
-    final Set<int> options = {correctAnswer};
+  // Optimize question generation
+  List<int> generateOptions(int correctAnswer) {
+    final Set<int> optionSet = {correctAnswer};
+    final int range = (correctAnswer * 0.5).round();
     final Random random = Random();
     
-    while (options.length < 4) {
-      int offset = random.nextInt(10) - 5; // Generate offset between -5 and 5
-      options.add(correctAnswer + offset);
+    while (optionSet.length < 4) {
+      int offset = random.nextInt(range * 2 + 1) - range;
+      int option = correctAnswer + offset;
+      if (option > 0 && option != correctAnswer) {
+        optionSet.add(option);
+      }
     }
     
-    return options.toList()..shuffle();
+    _options = optionSet.toList()..shuffle(random);
+    return _options;
   }
 
   // Check answer and update score
@@ -102,4 +111,17 @@ abstract class BaseGameController {
   QuestionModel getCurrentQuestion() {
     return questions[currentQuestionIndex];
   }
+}
+
+// Add this class to represent a question
+class Question {
+  final String questionText;
+  final List<int> options;
+  final int correctAnswer;
+
+  Question({
+    required this.questionText,
+    required this.options,
+    required this.correctAnswer,
+  });
 }

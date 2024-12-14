@@ -9,7 +9,7 @@ class SubtractionGameController extends BaseGameController {
     int maxNumber = (20 * difficulty).round();
 
     int num1 = getRandomNumber(1, maxNumber);
-    int num2 = getRandomNumber(1, num1); // Ensure positive result
+    int num2 = getRandomNumber(1, num1);
 
     currentNumbers = [num1, num2];
     correctAnswer = num1 - num2;
