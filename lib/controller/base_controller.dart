@@ -1,119 +1,84 @@
 import 'dart:math';
-import '../models/question_model.dart';
 import 'package:logger/logger.dart';
 
 abstract class BaseGameController {
-  final int totalQuestions = 10;
-  List<QuestionModel> questions = [];
-  int currentQuestionIndex = 0;
+  final logger = Logger();
   bool isGameActive = false;
+  int currentQuestionNumber = 0;
+  final int totalQuestions = 10;
   List<int> currentNumbers = [];
   int correctAnswer = 0;
-  int score = 0;
-  final logger = Logger();
-  int currentQuestionNumber = 1;
+  late List<int> options;
 
-  // Add this field at the top with other fields
-  List<int> _options = [];
-  List<int> get options => _options;
-
-  // Initialize and start the game
   void startGame() {
     isGameActive = true;
-    questions.clear();
-    currentQuestionIndex = 0;
-    score = 0;
-    
-    // Generate all questions at start
-    for (int i = 0; i < totalQuestions; i++) {
-      generateNewQuestion();
-      questions.add(QuestionModel(
-        numbers: List.from(currentNumbers),
-        correctAnswer: correctAnswer,
-        operation: getOperationSymbol(),
-        options: generateOptions(correctAnswer),
-      ));
-    }
+    currentQuestionNumber = 0;
     logger.i('Game started with $totalQuestions questions.');
+    nextQuestion();
   }
 
-  // Optimize question generation
-  List<int> generateOptions(int correctAnswer) {
-    final Set<int> optionSet = {correctAnswer};
-    final int range = (correctAnswer * 0.5).round();
-    final Random random = Random();
-    
-    while (optionSet.length < 4) {
-      int offset = random.nextInt(range * 2 + 1) - range;
-      int option = correctAnswer + offset;
-      if (option > 0 && option != correctAnswer) {
-        optionSet.add(option);
-      }
-    }
-    
-    _options = optionSet.toList()..shuffle(random);
-    return _options;
-  }
-
-  // Check answer and update score
-  bool checkAnswer(int userAnswer) {
-    logger.d('Checking answer - User input: $userAnswer, Correct answer: $correctAnswer');
+  bool nextQuestion() {
     if (!isGameActive) return false;
     
-    bool isCorrect = userAnswer == correctAnswer;
-    questions[currentQuestionIndex].isAnswered = true;
-    questions[currentQuestionIndex].isCorrect = isCorrect;
-    
-    if (isCorrect) score++;
-    
-    return isCorrect;
-  }
-
-  // Move to next question
-  bool nextQuestion() {
     if (currentQuestionNumber < totalQuestions) {
       currentQuestionNumber++;
-      if (currentQuestionIndex < totalQuestions - 1) {
-        currentQuestionIndex++;
-        // Update current numbers and correct answer for the new question
-        currentNumbers = questions[currentQuestionIndex].numbers;
-        correctAnswer = questions[currentQuestionIndex].correctAnswer;
-        logger.d('Next question loaded: ${getQuestionText()} = $correctAnswer');
-      }
+      generateNewQuestion();
+      generateOptions();
       return true;
     }
     return false;
   }
 
-  void endGame() {
-    isGameActive = false;
-    logger.i('Game ended. Final score: $score');
+  void generateNewQuestion();
+
+  void generateOptions() {
+    final random = Random();
+    options = [correctAnswer];
+    
+    while (options.length < 4) {
+      // Generate options within a reasonable range of the correct answer
+      int offset = random.nextInt(10) + 1;
+      int newOption = correctAnswer + (random.nextBool() ? offset : -offset);
+      
+      // Ensure all options are positive and unique
+      if (newOption > 0 && !options.contains(newOption)) {
+        options.add(newOption);
+      }
+    }
+    // Shuffle the options
+    options.shuffle();
   }
 
-  // Abstract methods to be implemented by specific game controllers
-  void generateNewQuestion();
-  String getQuestionText() {
-    QuestionModel question = getCurrentQuestion();
-    return '${question.numbers[0]} ${question.operation} ${question.numbers[1]} =';
+  bool checkAnswer(int userAnswer) {
+    return userAnswer == correctAnswer;
   }
-  
-  // Helper methods
-  String getOperationSymbol();
-  
+
+  void endGame() {
+    isGameActive = false;
+    logger.i('Game ended. Final score: $currentQuestionNumber');
+  }
+
   double getDifficultyMultiplier() {
-    return 1.0 + (currentQuestionIndex * 0.5);
+    return 1.0 + (currentQuestionNumber * 0.1);
   }
 
   int getRandomNumber(int min, int max) {
     return min + Random().nextInt(max - min + 1);
   }
 
-  QuestionModel getCurrentQuestion() {
-    return questions[currentQuestionIndex];
+  String getQuestionText();
+  
+  String getOperationSymbol();
+
+  Question getCurrentQuestion() {
+    return Question(
+      questionText: getQuestionText(),
+      options: options,
+      correctAnswer: correctAnswer
+    );
   }
 }
 
-// Add this class to represent a question
 class Question {
   final String questionText;
   final List<int> options;

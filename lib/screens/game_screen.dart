@@ -192,6 +192,9 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     final UserModel user = args['userModel'];
     final String gameName = args['gameName'];
 
+    // Determine if this is an options-based game
+    final bool isOptionsGame = gameName == 'Sum Sprint' || gameName == 'Minus Mastery';
+
     return Scaffold(
       appBar: GameTimerBar(
         user: user,
@@ -212,19 +215,19 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                 children: [
                   QuestionDisplay(
                     question: gameController.getQuestionText(),
-                    userInput: gameName == 'Sum Sprint' ? '?' : currentInput,
+                    userInput: isOptionsGame ? '?' : currentInput,
                     isCorrect: isCorrectAnswer,
                     textStyle: const TextStyle(
                       fontFamily: 'Swiss',
-                      fontSize: 45, // Increased font size for question
+                      fontSize: 45,
                     ),
                     inputTextStyle: const TextStyle(
                       fontFamily: 'Swiss',
-                      fontSize: 32, // Smaller font size for input answer
+                      fontSize: 32,
                     ),
                   ),
                   const SizedBox(height: 20),
-                  if (gameName == 'Sum Sprint')
+                  if (isOptionsGame)
                     AnswerOptions(
                       options: gameController.getCurrentQuestion().options,
                       onOptionSelected: handleOptionSelected,
@@ -236,20 +239,20 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               ),
             ),
             const SizedBox(height: 20),
-            if (gameName != 'Sum Sprint')
+            if (!isOptionsGame) ...[
               AnswerControls(
                 onClear: clearInput,
                 onSubmit: submitAnswer,
                 isEnabled: !isAnswerSelected,
               ),
-            if (gameName != 'Sum Sprint')
               NumberPad(
                 onNumberSelected: handleAnswer,
                 textStyle: const TextStyle(
                   fontFamily: 'Swiss',
-                  fontSize: 32, // Increased font size
+                  fontSize: 32,
                 ),
               ),
+            ],
           ],
         ),
       ),
