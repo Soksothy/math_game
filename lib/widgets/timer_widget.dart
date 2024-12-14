@@ -5,15 +5,17 @@ import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 class GameTimerBar extends StatefulWidget implements PreferredSizeWidget {
   final UserModel user;
   final int stars;
-  final int remainingSeconds;
+  final int duration;
   final VoidCallback? onTimerComplete;
+  final ValueChanged<String>? onTimeChange;
 
   const GameTimerBar({
     super.key,
     required this.user,
     required this.stars,
-    required this.remainingSeconds,
+    required this.duration,
     this.onTimerComplete,
+    this.onTimeChange,
   });
 
   @override
@@ -25,28 +27,30 @@ class GameTimerBar extends StatefulWidget implements PreferredSizeWidget {
 
 class _GameTimerBarState extends State<GameTimerBar> {
   late CountDownController _controller;
-  Key _timerKey = UniqueKey();
+  bool _isTimerRunning = false; // Add this flag
 
   @override
   void initState() {
     super.initState();
     _controller = CountDownController();
+    // Initialize the timer as running
+    _isTimerRunning = true;
   }
 
   @override
   void didUpdateWidget(GameTimerBar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.remainingSeconds != widget.remainingSeconds) {
-      // Force timer rebuild with new key
-      setState(() {
-        _timerKey = UniqueKey();
-      });
+    if (widget.duration != oldWidget.duration) {
+      // Restart the timer with the new duration
+      _controller.restart(duration: widget.duration);
     }
   }
 
   Color _getTimerColor() {
-    if (widget.remainingSeconds > 5) return const Color(0xFF4CAF50);
-    if (widget.remainingSeconds > 2) return const Color(0xFFFF9800);
+    final time = _controller.getTime() ?? '0';
+    final remainingTime = double.tryParse(time) ?? 0;
+    if (remainingTime > 5) return const Color(0xFF4CAF50);
+    if (remainingTime > 2) return const Color(0xFFFF9800);
     return const Color(0xFFFF5252);
   }
 
@@ -125,16 +129,15 @@ class _GameTimerBarState extends State<GameTimerBar> {
                     Padding(
                       padding: const EdgeInsets.only(right: 37.0), // Adjust padding to move timer left
                       child: CircularCountDownTimer(
-                        key: _timerKey,
-                        duration: widget.remainingSeconds,
+                        duration: widget.duration,
                         initialDuration: 0,
                         controller: _controller,
                         width: 70,
                         height: 70,
-                        ringColor: _getTimerColor(),
-                        fillColor: _getTimerColor().withOpacity(0.2),
+                        ringColor: Colors.grey.withOpacity(0.3),
+                        fillColor: _getTimerColor(),
                         backgroundColor: Colors.white,
-                        strokeWidth: 5.0,
+                        strokeWidth: 8.0,
                         strokeCap: StrokeCap.round,
                         textStyle: TextStyle(
                           fontSize: 22,
@@ -144,8 +147,15 @@ class _GameTimerBarState extends State<GameTimerBar> {
                         textFormat: CountdownTextFormat.S,
                         isReverse: true,
                         isReverseAnimation: true,
-                        autoStart: true,
-                        onComplete: widget.onTimerComplete,
+                        autoStart: true, // Set autoStart to true
+                        onStart: () {
+                          _isTimerRunning = true;
+                        },
+                        onChange: widget.onTimeChange, // Add this line
+                        onComplete: () {
+                          _isTimerRunning = false; // Update the flag when timer completes
+                          widget.onTimerComplete?.call();
+                        },
                       ),
                     ),
                   ],
@@ -173,9 +183,7 @@ class _GameTimerBarState extends State<GameTimerBar> {
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
+              ],            ),          ),
         ),
       ),
     );

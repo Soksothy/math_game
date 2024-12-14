@@ -20,101 +20,46 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   late BaseGameController gameController;
-  int remainingSeconds = 10;  // 10 seconds per question
+  final int initialDuration = 10;  // Fixed duration per question
+  int remainingSeconds = 10;  // To display remaining time
   int stars = 0;
   bool isAnswerSelected = false;
   String currentInput = '';
   bool? isCorrectAnswer;
-  Timer? _timer; // Make timer nullable and remove late
   final logger = Logger();
   late String gameName; // Add this variable
+  int questionIndex = 0; // Add this variable to track the current question index
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // Initialize timer with a dummy that does nothing
-    _timer = Timer(Duration.zero, () {});
+    // Remove the custom timer initialization
   }
 
   @override
   void dispose() {
-    _timer?.cancel(); // Safe cancel in dispose
+    // Remove the custom timer cancellation
     gameController.endGame();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused) {
-      _timer?.cancel(); // Safe cancel
-    } else if (state == AppLifecycleState.resumed) {
-      if (gameController.isGameActive && !isAnswerSelected) {
-        startTimer();
-      }
-    }
-  }
+  // Remove the custom startTimer and timeUp methods
+  // ...existing code...
 
-  // Optimize timer management
-  void startTimer() {
-    _timer?.cancel(); // Safely cancel existing timer if any
-    
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-      
-      if (remainingSeconds > 0) {
-        setState(() {
-          remainingSeconds--;
-        });
-      } else {
-        timeUp();
-      }
-    });
-  }
-
-  void timeUp() {
-    _timer?.cancel();
-    if (!mounted) return;
-    if (!isAnswerSelected) {
-      setState(() {
-        isAnswerSelected = true;
-        isCorrectAnswer = false; // Mark as incorrect if time runs out
-      });
-
-      Future.delayed(const Duration(seconds: 1), () {
-        if (!mounted) return;
-        moveToNextQuestion();
-      });
-    }
-  }
-
-  // Optimize state updates
   void moveToNextQuestion() {
     if (!mounted) return;
     
     if (gameController.nextQuestion()) {
-      // Batch state updates
       setState(() {
         isAnswerSelected = false;
         isCorrectAnswer = null;
-        remainingSeconds = 10;
         currentInput = '';
-      });
-      
-      // Delay timer start slightly to ensure smooth transition
-      Future.microtask(() {
-        if (mounted) {
-          startTimer();
-        }
+        remainingSeconds = initialDuration; // Reset to initial duration
+        questionIndex += 1; // Increment the question index
       });
     } else {
-      if (_timer?.isActive ?? false) {
-        _timer?.cancel();
-      }
       gameController.endGame();
       // Navigate to results screen
     }
@@ -129,7 +74,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
 
     gameController = GameControllerFactory.createController(gameType);
     gameController.startGame();
-    startTimer(); // Start timer when game starts
+    // Remove startTimer(); // Start timer when game starts
   }
 
   void handleAnswer(int number) {
@@ -143,7 +88,6 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   void submitAnswer() {
     if (isAnswerSelected || currentInput.isEmpty) return;
     
-    _timer?.cancel(); // Stop the current timer
     try {
       int answer = int.parse(currentInput);
       logger.d('Question: ${gameController.getQuestionText()}'); // Debug log
@@ -174,7 +118,6 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
       setState(() {
         currentInput = '';
       });
-      startTimer(); // Restart timer if there was an error
     }
   }
 
@@ -182,6 +125,21 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     if (!isAnswerSelected) {
       setState(() {
         currentInput = '';
+      });
+    }
+  }
+
+  void timeUp() {
+    if (!mounted) return;
+    if (!isAnswerSelected) {
+      setState(() {
+        isAnswerSelected = true;
+        isCorrectAnswer = false; // Mark as incorrect if time runs out
+      });
+
+      Future.delayed(const Duration(seconds: 1), () {
+        if (!mounted) return;
+        moveToNextQuestion();
       });
     }
   }
@@ -197,9 +155,21 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
 
     return Scaffold(
       appBar: GameTimerBar(
+        key: ValueKey(questionIndex), // Add a unique key based on questionIndex
         user: user,
         stars: stars,
-        remainingSeconds: remainingSeconds,
+        duration: initialDuration, // Use fixed initial duration
+        onTimerComplete: timeUp,
+        onTimeChange: (time) {
+          if (!mounted) return;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() {
+                remainingSeconds = int.parse(time);
+              });
+            }
+          });
+        },
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -262,7 +232,6 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   void handleOptionSelected(int selectedOption) {
     if (isAnswerSelected) return;
 
-    _timer?.cancel(); // Stop the current timer
     bool isCorrect = gameController.checkAnswer(selectedOption);
 
     setState(() {
