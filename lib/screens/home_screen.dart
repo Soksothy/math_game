@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: double.infinity,
                   child: const Text(
                     'Addition',
-                    style: TextStyle(fontSize: 35),
+                    style: TextStyle(fontSize: 35, color: Color(0xFF525252)),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -180,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: double.infinity,
                   child: const Text(
                     'Subtraction',
-                    style: TextStyle(fontSize: 35),
+                    style: TextStyle(fontSize: 35, color: Color(0xFF525252)),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -325,7 +325,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: double.infinity,
                   child: const Text(
                     'Multiply',
-                    style: TextStyle(fontSize: 35),
+                     style: TextStyle(fontSize: 35, color: Color(0xFF525252)),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -441,7 +441,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: double.infinity,
                   child: const Text(
                     'Divide',
-                    style: TextStyle(fontSize: 35),
+                     style: TextStyle(fontSize: 35, color: Color(0xFF525252)),
                   ),
                 ),
                 const SizedBox(height: 20),

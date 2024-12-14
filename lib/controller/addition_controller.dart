@@ -13,11 +13,15 @@ class AdditionGameController extends BaseGameController {
       getRandomNumber(1, maxNumber),
     ];
     correctAnswer = currentNumbers[0] + currentNumbers[1];
+    
+    // Validate question generation
+    assert(correctAnswer == (currentNumbers[0] + currentNumbers[1]), 'Answer generation mismatch');
+    logger.d('Generated new addition question: ${currentNumbers[0]} + ${currentNumbers[1]} = $correctAnswer');
   }
 
   @override
   String getQuestionText() {
-    return '${currentNumbers[0]} + ${currentNumbers[1]} = ?';
+    return '${currentNumbers[0]} + ${currentNumbers[1]} =';
   }
 
   @override

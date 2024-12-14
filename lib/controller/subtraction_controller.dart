@@ -17,7 +17,7 @@ class SubtractionGameController extends BaseGameController {
 
   @override
   String getQuestionText() {
-    return '${currentNumbers[0]} - ${currentNumbers[1]} = ?';
+    return '${currentNumbers[0]} - ${currentNumbers[1]} =';
   }
 
   @override

@@ -1,28 +1,46 @@
 import 'package:flutter/material.dart';
 
 class CustomBackButton extends StatelessWidget {
-  final double width;
-  final double height;
-  final String? routeName;
+  final VoidCallback? onPressed;
 
   const CustomBackButton({
-    Key? key,
-    this.width = 200,
-    this.height = 200,
-    this.routeName = '/',
-  }) : super(key: key);
+    super.key,
+    this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Image.asset(
-        'lib/asset/back_icon.png',
-        width: width,
-        height: height,
+    return Container(
+      child: IconButton(
+        icon: Image.asset(
+          'lib/asset/back_icon.png',
+          width: 40,
+          height: 40,
+        ),
+        color: Colors.blue,
+        onPressed: onPressed ?? () {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Quit Game?'),
+              content: const Text('Are you sure you want to quit? Your progress will be lost.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close dialog
+                    Navigator.pop(context); // Go back to previous screen
+                  },
+                  child: const Text('Quit'),
+                ),
+              ],
+            ),
+          );
+        },
       ),
-      onPressed: () {
-        Navigator.of(context).pushReplacementNamed(routeName!);
-      },
     );
   }
 }

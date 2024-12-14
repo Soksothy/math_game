@@ -1,14 +1,17 @@
 import 'dart:math';
 import '../models/question_model.dart';
+import 'package:logger/logger.dart';
 
 abstract class BaseGameController {
-  final int totalQuestions = 5;
+  final int totalQuestions = 10;
   List<QuestionModel> questions = [];
   int currentQuestionIndex = 0;
   bool isGameActive = false;
   List<int> currentNumbers = [];
   int correctAnswer = 0;
   int score = 0;
+  final logger = Logger();
+  int currentQuestionNumber = 1;
 
   // Initialize and start the game
   void startGame() {
@@ -27,6 +30,7 @@ abstract class BaseGameController {
         options: generateOptions(),
       ));
     }
+    logger.i('Game started with $totalQuestions questions.');
   }
 
   // Generate 4 options including the correct answer
@@ -43,10 +47,11 @@ abstract class BaseGameController {
   }
 
   // Check answer and update score
-  bool checkAnswer(int answer) {
+  bool checkAnswer(int userAnswer) {
+    logger.d('Checking answer - User input: $userAnswer, Correct answer: $correctAnswer');
     if (!isGameActive) return false;
     
-    bool isCorrect = answer == correctAnswer;
+    bool isCorrect = userAnswer == correctAnswer;
     questions[currentQuestionIndex].isAnswered = true;
     questions[currentQuestionIndex].isCorrect = isCorrect;
     
@@ -57,8 +62,15 @@ abstract class BaseGameController {
 
   // Move to next question
   bool nextQuestion() {
-    if (currentQuestionIndex < totalQuestions - 1) {
-      currentQuestionIndex++;
+    if (currentQuestionNumber < totalQuestions) {
+      currentQuestionNumber++;
+      if (currentQuestionIndex < totalQuestions - 1) {
+        currentQuestionIndex++;
+        // Update current numbers and correct answer for the new question
+        currentNumbers = questions[currentQuestionIndex].numbers;
+        correctAnswer = questions[currentQuestionIndex].correctAnswer;
+        logger.d('Next question loaded: ${getQuestionText()} = $correctAnswer');
+      }
       return true;
     }
     return false;
@@ -66,11 +78,15 @@ abstract class BaseGameController {
 
   void endGame() {
     isGameActive = false;
+    logger.i('Game ended. Final score: $score');
   }
 
   // Abstract methods to be implemented by specific game controllers
   void generateNewQuestion();
-  String getQuestionText();
+  String getQuestionText() {
+    QuestionModel question = getCurrentQuestion();
+    return '${question.numbers[0]} ${question.operation} ${question.numbers[1]} =';
+  }
   
   // Helper methods
   String getOperationSymbol();
@@ -81,5 +97,9 @@ abstract class BaseGameController {
 
   int getRandomNumber(int min, int max) {
     return min + Random().nextInt(max - min + 1);
+  }
+
+  QuestionModel getCurrentQuestion() {
+    return questions[currentQuestionIndex];
   }
 }

@@ -15,6 +15,10 @@ class QuestionModel {
     this.isCorrect,
   }) : options = options ?? [];
 
+  int get firstNumber => numbers[0];
+  int get secondNumber => numbers[1];
+  String get operator => operation;
+
   String get questionText {
     return '${numbers[0]} $operation ${numbers[1]} = ?';
   }

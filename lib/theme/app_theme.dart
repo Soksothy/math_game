@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static ThemeData get theme {
     return ThemeData(
-      fontFamily: 'LazySmooth',
+      fontFamily: 'Swiss',
       textTheme: const TextTheme(
-        bodyLarge: TextStyle(fontFamily: 'LazySmooth'),
-        bodyMedium: TextStyle(fontFamily: 'LazySmooth'),
-        titleLarge: TextStyle(fontFamily: 'LazySmooth'),
-        titleMedium: TextStyle(fontFamily: 'LazySmooth'),
+        bodyLarge: TextStyle(fontFamily: 'Swiss'),
+        bodyMedium: TextStyle(fontFamily: 'Swiss'),
+        titleLarge: TextStyle(fontFamily: 'Swiss'),
+        titleMedium: TextStyle(fontFamily: 'Swiss'),
       ),
     );
   }

@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  logger: ^2.0.1
   shared_preferences: ^2.2.0
   circular_countdown_timer: ^0.2.4
 
@@ -100,8 +101,28 @@ flutter:
     - lib/asset/div1.png
     - lib/asset/div2.png
     - lib/asset/div3.png
-
-
+    # - lib/asset/num0.png
+    # - lib/asset/num1.png
+    # - lib/asset/num2.png
+    # - lib/asset/num3.png
+    # - lib/asset/num4.png
+    # - lib/asset/num5.png
+    # - lib/asset/num6.png
+    # - lib/asset/num7.png
+    # - lib/asset/num8.png
+    # - lib/asset/num9.png
+    - lib/asset/delete.png
+    - lib/asset/numbers/num0.png
+    - lib/asset/numbers/num1.png
+    - lib/asset/numbers/num2.png
+    - lib/asset/numbers/num3.png
+    - lib/asset/numbers/num4.png
+    - lib/asset/numbers/num5.png
+    - lib/asset/numbers/num6.png
+    - lib/asset/numbers/num7.png
+    - lib/asset/numbers/num8.png
+    - lib/asset/numbers/num9.png
+    - lib/asset/numbers/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
