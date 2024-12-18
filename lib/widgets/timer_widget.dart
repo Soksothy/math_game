@@ -183,7 +183,9 @@ class _GameTimerBarState extends State<GameTimerBar> {
                     ],
                   ),
                 ),
-              ],            ),          ),
+              ],           
+               ),          
+              ),
         ),
       ),
     );

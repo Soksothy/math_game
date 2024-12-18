@@ -3,12 +3,10 @@ import 'package:math_game/models/user_model.dart';
 
 class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
   final UserModel user;
-  final int stars;
 
   const GameAppBar({
     super.key,
     required this.user,
-    required this.stars,
   });
 
   @override
@@ -142,21 +140,17 @@ class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                            color: const Color(0xFFECECEC).withOpacity(0.5),
+                          color: const Color(0xFFECECEC).withOpacity(0.5),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Image.asset(
-                              'lib/asset/star.png',
-                              height: 38,
-                              width: 38,
-                            ),
+                            Image.asset('lib/asset/coin.png', width: 38, height: 38),
                             const SizedBox(width: 8),
                             Text(
-                              '$stars',
+                              '${user.stars}',
                               style: const TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold,

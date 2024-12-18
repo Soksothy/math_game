@@ -10,6 +10,7 @@ import 'package:math_game/widgets/question_header.dart';  // Add this import
 import 'package:math_game/widgets/answer_options.dart'; // Add this import
 import 'dart:async';
 import 'package:logger/logger.dart';
+import 'package:math_game/services/user_storage.dart'; // Add this import
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -29,11 +30,16 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   final logger = Logger();
   late String gameName; // Add this variable
   int questionIndex = 0; // Add this variable to track the current question index
+  late UserModel userModel; // Add this variable to store the user model
+  DateTime? startTime;
+  Duration totalTime = Duration.zero;
+  late Map<String, dynamic> args; // Add this line near the top with other late variables
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    startTime = DateTime.now();
     // Remove the custom timer initialization
   }
 
@@ -60,17 +66,37 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         questionIndex += 1; // Increment the question index
       });
     } else {
+      // Game ends
       gameController.endGame();
+      totalTime = DateTime.now().difference(startTime!);
+
+      // Save updated user data
+      UserStorage.saveUser(userModel); // Add this line
+
       // Navigate to results screen
+      Navigator.pushReplacementNamed(
+        context,
+        '/results',
+        arguments: {
+          'userModel': userModel, // Ensure updated userModel is passed
+          'stars': stars,
+          'gameName': gameName,
+          'gameType': args['gameType'], // Add this line
+          'totalQuestions': gameController.totalQuestions,
+          'totalTime': totalTime,
+          'coinsEarned': stars * 10, // Pass coins earned
+        },
+      );
     }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final String gameType = args['gameType'];
     gameName = args['gameName']; // Get the game name
+    userModel = args['userModel']; // Get the user model
 
     gameController = GameControllerFactory.createController(gameType);
     gameController.startGame();
@@ -90,20 +116,13 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     
     try {
       int answer = int.parse(currentInput);
-      logger.d('Question: ${gameController.getQuestionText()}'); // Debug log
-      logger.d('User answer: $answer'); // Debug log
-      logger.d('Correct answer: ${gameController.correctAnswer}'); // Debug log
-      
-      if (!mounted) return;
       
       setState(() {
         isAnswerSelected = true;
         isCorrectAnswer = gameController.checkAnswer(answer);
         if (isCorrectAnswer!) {
-          stars++;
-          logger.i('Correct answer!');
-        } else {
-          logger.w('Wrong answer. User input: $answer, Expected: ${gameController.correctAnswer}');
+          stars++; // Only increment local stars counter
+          // Remove the user.stars update from here
         }
       });
 
@@ -112,9 +131,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         moveToNextQuestion();
       });
     } catch (e) {
-      logger.e('Error parsing answer: $e'); // Debug log
-      // Handle invalid input
-      if (!mounted) return;
+      logger.e('Error parsing answer: $e');
       setState(() {
         currentInput = '';
       });
@@ -146,9 +163,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    final UserModel user = args['userModel'];
-    final String gameName = args['gameName'];
+    final UserModel user = userModel;
 
     // Determine if this is an options-based game
     final bool isOptionsGame = gameName == 'Sum Sprint' || gameName == 'Minus Mastery';

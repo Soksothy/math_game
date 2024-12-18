@@ -30,7 +30,7 @@ class StartScreen extends StatelessWidget {
             const Spacer(),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/create'); 
+                Navigator.pushNamed(context, '/create');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF895CB2),

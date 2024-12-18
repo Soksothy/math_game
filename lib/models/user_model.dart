@@ -4,7 +4,7 @@ class UserModel {
   bool isBoy;
   int avatarIndex;
   int level;
-  int coins;
+  int stars; // Replace 'coins' with 'stars'
   int experience;
   int highestScore;
   DateTime lastPlayedAt;
@@ -18,7 +18,7 @@ class UserModel {
     required this.isBoy,
     required this.avatarIndex,
     this.level = 1,
-    this.coins = 0,
+    this.stars = 0, // Initialize stars
     this.experience = 0,
     this.highestScore = 0,
     DateTime? lastPlayedAt,
@@ -46,10 +46,10 @@ class UserModel {
     calculateLevel();
   }
 
-  // Add coins with validation
-  void addCoins(int amount) {
-    if (amount < 0) throw ArgumentError('Coin amount cannot be negative');
-    coins += amount;
+  // Add stars with validation
+  void addStars(int amount) {
+    if (amount < 0) throw ArgumentError('Star amount cannot be negative');
+    stars += amount;
   }
 
   // Update topic score
@@ -82,7 +82,7 @@ class UserModel {
         'isBoy': isBoy,
         'avatarIndex': avatarIndex,
         'level': level,
-        'coins': coins,
+        'stars': stars, // Update 'coins' to 'stars'
         'experience': experience,
         'highestScore': highestScore,
         'lastPlayedAt': lastPlayedAt.toIso8601String(),
@@ -92,16 +92,33 @@ class UserModel {
 
   // Create from JSON
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-        name: json['name'],
-        age: json['age'],
-        isBoy: json['isBoy'],
-        avatarIndex: json['avatarIndex'],
-        level: json['level'],
-        coins: json['coins'],
-        experience: json['experience'],
-        highestScore: json['highestScore'],
-        lastPlayedAt: DateTime.parse(json['lastPlayedAt']),
-        achievementsUnlocked: List<String>.from(json['achievementsUnlocked']),
-        topicScores: Map<String, int>.from(json['topicScores']),
+        name: json['name'] ?? 'Player',
+        age: json['age'] ?? 10,
+        isBoy: json['isBoy'] ?? true,
+        avatarIndex: json['avatarIndex'] ?? 0,
+        level: json['level'] ?? 1,
+        stars: json['stars'] ?? 0, // Ensure 'stars' is not null
+        experience: json['experience'] ?? 0,
+        highestScore: json['highestScore'] ?? 0,
+        lastPlayedAt: json['lastPlayedAt'] != null
+            ? DateTime.parse(json['lastPlayedAt'])
+            : DateTime.now(),
+        achievementsUnlocked: json['achievementsUnlocked'] != null
+            ? List<String>.from(json['achievementsUnlocked'])
+            : [],
+        topicScores: json['topicScores'] != null
+            ? Map<String, int>.from(json['topicScores'])
+            : {},
       );
+
+  static UserModel defaultUser() {
+    return UserModel(
+      name: 'Player', // Default name
+      age: 10, // Example default age
+      isBoy: true, // Default gender
+      avatarIndex: 0, // Default avatar index
+      level: 1, // Starting level
+      stars: 0, // Initialize 'stars' instead of 'coins'
+    );
+  }
 }

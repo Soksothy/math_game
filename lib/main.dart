@@ -4,6 +4,7 @@ import 'package:math_game/screens/game_screen.dart';
 import 'package:math_game/screens/start_screen.dart';
 import 'package:math_game/screens/create_profile.dart';
 import 'package:math_game/screens/create_profile_age.dart';
+import 'package:math_game/screens/results_screen.dart';
 
 
 void main() {
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/createAge': (context) => const CreateAgeScreen(),
         '/home': (context) => const HomeScreen(),
         '/game': (context) => const GameScreen(),
+        '/results': (context) => const ResultsScreen(),
       },
     );
   }

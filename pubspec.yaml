@@ -33,6 +33,7 @@ dependencies:
   logger: ^2.0.1
   shared_preferences: ^2.2.0
   circular_countdown_timer: ^0.2.4
+  confetti: ^0.7.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -123,6 +124,8 @@ flutter:
     - lib/asset/numbers/num8.png
     - lib/asset/numbers/num9.png
     - lib/asset/numbers/
+    - lib/asset/win.png
+    - lib/asset/coin.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

@@ -7,16 +7,18 @@ class UserStorage {
 
   static Future<void> saveUser(UserModel user) async {
     final prefs = await SharedPreferences.getInstance();
-    final userData = user.toJson();
-    await prefs.setString(_userKey, jsonEncode(userData));
+    final userData = jsonEncode(user.toJson());
+    await prefs.setString(_userKey, userData);
   }
 
   static Future<UserModel?> getUser() async {
     final prefs = await SharedPreferences.getInstance();
     final userData = prefs.getString(_userKey);
     if (userData != null) {
-      return UserModel.fromJson(jsonDecode(userData));
+      final Map<String, dynamic> userMap = jsonDecode(userData);
+      return UserModel.fromJson(userMap);
+    } else {
+      return null;
     }
-    return null;
   }
 }

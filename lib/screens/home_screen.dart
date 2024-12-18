@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:math_game/widgets/app_bar.dart';
 import 'package:math_game/widgets/bottom_navigation_bar.dart';
 import 'package:math_game/models/user_model.dart';
+import 'package:math_game/services/user_storage.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,22 +12,47 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late UserModel user;
+  bool isInitialized = false;
   int _selectedIndex = 2;
 
   @override
-  Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    final user = args['userModel'] as UserModel;
+  void initState() {
+    super.initState();
+    // ...existing code...
+  }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!isInitialized) {
+      _initializeUser();
+      isInitialized = true;
+    }
+  }
+
+  void _initializeUser() async {
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    if (args != null && args.containsKey('userModel')) {
+      user = args['userModel'] as UserModel;
+    } else {
+      user = await UserStorage.getUser() ?? UserModel.defaultUser();
+    }
+
+    setState(() {}); // Update UI after loading the user
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: GameAppBar(
         user: user,
-        stars: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SizedBox(
-          child: SingleChildScrollView( // Added SingleChildScrollView
+          child: SingleChildScrollView( 
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
