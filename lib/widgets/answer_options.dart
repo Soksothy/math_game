@@ -56,26 +56,29 @@ class AnswerOptions extends StatelessWidget {
 
   Widget _buildButton(int index) {
     if (index >= options.length) {
-      return const SizedBox(width: 140); // Reduced placeholder width
+      return const SizedBox(width: 160); // Increased placeholder width
     }
-    return ElevatedButton(
-      onPressed: isEnabled ? () => onOptionSelected(options[index]) : null,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: _softColors[index % _softColors.length],
-        padding: EdgeInsets.symmetric(
-          vertical: 25,
-          horizontal: optionSize * 0.8, // Reduced horizontal padding
+    return SizedBox(
+      width: 160, // Increased fixed width
+      child: ElevatedButton(
+        onPressed: isEnabled ? () => onOptionSelected(options[index]) : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _softColors[index % _softColors.length],
+          padding: const EdgeInsets.symmetric(
+            vertical: 30, // Increased vertical padding
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
-        ),
-      ),
-      child: Text(
-        '${options[index]}',
-        style: const TextStyle(
-          fontSize: 32,
-          color: Color(0xFF525252),
-          fontWeight: FontWeight.bold,
+        child: Text(
+          '${options[index]}',
+          style: const TextStyle(
+            fontSize: 32,
+            color: Color(0xFF525252),
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center, // Center align the text
         ),
       ),
     );

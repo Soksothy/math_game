@@ -8,6 +8,7 @@ class GameTimerBar extends StatefulWidget implements PreferredSizeWidget {
   final int duration;
   final VoidCallback? onTimerComplete;
   final ValueChanged<String>? onTimeChange;
+  // Remove leading property
 
   const GameTimerBar({
     super.key,
@@ -16,6 +17,7 @@ class GameTimerBar extends StatefulWidget implements PreferredSizeWidget {
     required this.duration,
     this.onTimerComplete,
     this.onTimeChange,
+    // Remove leading from constructor
   });
 
   @override
@@ -58,6 +60,7 @@ class _GameTimerBarState extends State<GameTimerBar> {
   Widget build(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: false,
+      // Remove leading property
       flexibleSpace: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(

@@ -143,217 +143,217 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFFFFFBF2), Color(0xFFFFF0D6)],
+                colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 231, 231, 231)],
               ),
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start, // Change from center to start
               children: [
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'CONGRATULATIONS!',
-                        style: TextStyle(
-                          fontSize: 35, // Reduced from 48
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFFFFAF57),
-                        ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.05), // Add small top padding
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'CONGRATULATIONS!',
+                      style: TextStyle(
+                        fontSize: 35, // Reduced from 48
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFFFAF57),
                       ),
-                      const SizedBox(height: 24), // Reduced from 32
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: _buildStatsCard(
-                                'Stars',
-                                '',
-                                child: AnimatedValue(
-                                  value: stars,
-                                  textStyle: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFFFAF57),
-                                  ),
-                                  duration: const Duration(milliseconds: 1000),
-                                  curve: Curves.easeInOut,
+                    ),
+                    const SizedBox(height: 16), // Reduced from 24
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _buildStatsCard(
+                              'Stars',
+                              '',
+                              child: AnimatedValue(
+                                value: stars,
+                                textStyle: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFFFFAF57),
                                 ),
+                                duration: const Duration(milliseconds: 1000),
+                                curve: Curves.easeInOut,
                               ),
                             ),
                           ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: _buildStatsCard('Time', _formatDuration(totalTime)),
-                            ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _buildStatsCard('Time', _formatDuration(totalTime)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12), // Reduced spacing
+                    // Level Progress Section
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 24),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 2,
+                            blurRadius: 5,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12), // Reduced spacing
-                      // Level Progress Section
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 24),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.1),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Level ${user.level}',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF525252),
-                                  ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Level ${user.level}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF525252),
                                 ),
-                                AnimatedBuilder(
-                                  animation: _progressAnimation,
-                                  builder: (context, child) {
-                                    return Text(
-                                      '${((_progressAnimation.value * 10).floor())}/10 stars',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFFFFAF57),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: AnimatedBuilder(
+                              ),
+                              AnimatedBuilder(
                                 animation: _progressAnimation,
                                 builder: (context, child) {
-                                  return LinearProgressIndicator(
-                                    value: _progressAnimation.value,
-                                    minHeight: 8, // Reduced from 12
-                                    backgroundColor: Colors.grey[200],
-                                    valueColor: const AlwaysStoppedAnimation<Color>(
-                                      Color(0xFFFFAF57),
+                                  return Text(
+                                    '${((_progressAnimation.value * 10).floor())}/10 stars',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFFFFAF57),
                                     ),
                                   );
                                 },
                               ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: AnimatedBuilder(
+                              animation: _progressAnimation,
+                              builder: (context, child) {
+                                return LinearProgressIndicator(
+                                  value: _progressAnimation.value,
+                                  minHeight: 8, // Reduced from 12
+                                  backgroundColor: Colors.grey[200],
+                                  valueColor: const AlwaysStoppedAnimation<Color>(
+                                    Color(0xFFFFAF57),
+                                  ),
+                                );
+                              },
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 12),
-                      Image.asset(
-                        leveledUp ? 'lib/asset/up_level.png' : 'lib/asset/win.png',
-                        height: 200, // Reduced from 240
+                    ),
+                    const SizedBox(height: 8), // Reduced from 12
+                    Image.asset(
+                      leveledUp ? 'lib/asset/up_level.png' : 'lib/asset/win.png',
+                      height: 180, // Reduced from 200
+                    ),
+                    const SizedBox(height: 8), // Reduced from 12
+                    Text(
+                       'Great Jop, ${user.name}!',
+                      style: const TextStyle(
+                        fontSize: 23, // Reduced from 32
+                        color: Color(0xFF525252),
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(height: 12),
-                      Text(
-                         'Great Jop, ${user.name}!',
-                        style: const TextStyle(
-                          fontSize: 23, // Reduced from 32
-                          color: Color(0xFF525252),
+                    ),
+                    const SizedBox(height: 12),
+                    if (leveledUp) ...[
+                      const Text(
+                        'Level Up!',
+                        style: TextStyle(
+                          fontSize: 28, // Reduced from 32
+                          color: Color(0xFF74CF48),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      if (leveledUp) ...[
-                        const Text(
-                          'Level Up!',
-                          style: TextStyle(
-                            fontSize: 28, // Reduced from 32
-                            color: Color(0xFF74CF48),
-                            fontWeight: FontWeight.bold,
-                          ),
+                      Text(
+                        'Level $_initialLevel → ${user.level}',
+                        style: const TextStyle(
+                          fontSize: 20, // Reduced from 24
+                          color: Color(0xFF525252),
                         ),
-                        Text(
-                          'Level $_initialLevel → ${user.level}',
-                          style: const TextStyle(
-                            fontSize: 20, // Reduced from 24
-                            color: Color(0xFF525252),
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 24),
-                      
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                        ElevatedButton(
-                          onPressed: () async {
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                              '/home',
-                              (route) => false,
-                              arguments: {'userModel': user}, // Pass the updated userModel
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(255, 252, 189, 123),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 36, // Reduced padding
-                            vertical: 12, // Reduced padding
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          ),
-                          child: const Text(
-                          'Home',
-                          style: TextStyle(
-                            fontSize: 24,
-                            color: Colors.white,
-                          ),
-                          ),
-                        ),
-                        const SizedBox(width: 12), // Reduced from 16
-                        ElevatedButton(
-                          onPressed: () {
-                            final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                              '/game',
-                              (route) => false,
-                              arguments: {
-                                'userModel': user,
-                                'gameType': args['gameType'] ?? 'addition', // Add gameType
-                                'gameName': args['gameName'] ?? 'Sum Sprint', // Add gameName
-                              },
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF74CF48),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 36, // Reduced padding
-                            vertical: 12, // Reduced padding
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          ),
-                          child: const Text(
-                          'Retry',
-                          style: TextStyle(
-                            fontSize: 24,
-                            color: Colors.white,
-                          ),
-                        ),
-                        ),
-                        ],
                       ),
                     ],
-                  ),
+                    const SizedBox(height: 24),
+                    
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                      ElevatedButton(
+                        onPressed: () async {
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            '/home',
+                            (route) => false,
+                            arguments: {'userModel': user}, // Pass the updated userModel
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 252, 189, 123),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 36, // Reduced padding
+                          vertical: 12, // Reduced padding
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        ),
+                        child: const Text(
+                        'Home',
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Colors.white,
+                        ),
+                        ),
+                      ),
+                      const SizedBox(width: 12), // Reduced from 16
+                      ElevatedButton(
+                        onPressed: () {
+                          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+                          Navigator.pushReplacementNamed(
+                            context,
+                            '/game',
+                            arguments: {
+                              'userModel': user,
+                              'gameType': args['gameType'] ?? 'addition', // Add gameType
+                              'gameName': args['gameName'] ?? 'Sum Sprint', // Add gameName
+                            },
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF74CF48),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 36, // Reduced padding
+                          vertical: 12, // Reduced padding
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        ),
+                        child: const Text(
+                        'Retry',
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Colors.white,
+                        ),
+                      ),
+                      ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -168,7 +168,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     // Determine if this is an options-based game
     final bool isOptionsGame = gameName == 'Sum Sprint' || gameName == 'Minus Mastery';
 
-    return Scaffold(
+    return Scaffold( // Remove WillPopScope
       appBar: GameTimerBar(
         key: ValueKey(questionIndex), // Add a unique key based on questionIndex
         user: user,
@@ -185,6 +185,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             }
           });
         },
+        // Remove leading property
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
