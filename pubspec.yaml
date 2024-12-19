@@ -126,6 +126,7 @@ flutter:
     - lib/asset/numbers/
     - lib/asset/win.png
     - lib/asset/coin.png
+    - lib/asset/up_level.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

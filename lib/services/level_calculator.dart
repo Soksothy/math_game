@@ -7,7 +7,7 @@ class LevelProgress {
 
 class LevelCalculator {
   static LevelProgress calculateProgress(int totalStars) {
-    const int starsPerLevel = 5;
+    const int starsPerLevel = 10;
 
     final int currentLevel = (totalStars / starsPerLevel).floor();
     final double progress = (totalStars % starsPerLevel) / starsPerLevel;
