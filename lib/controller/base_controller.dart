@@ -73,7 +73,7 @@ abstract class BaseGameController {
   Question getCurrentQuestion() {
     return Question(
       questionText: getQuestionText(),
-      options: options,
+      options: options, // Ensure options are included
       correctAnswer: correctAnswer
     );
   }

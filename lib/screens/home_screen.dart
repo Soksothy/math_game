@@ -521,7 +521,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               arguments: {
                                 'userModel': user,
                                 'gameType': 'division',
-                                'gameName': 'Div Genius'
+                                'gameName': 'Div Genius' // Ensure correct gameName
                               }
                             );
                           },

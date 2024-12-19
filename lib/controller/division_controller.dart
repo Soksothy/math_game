@@ -1,6 +1,9 @@
+import 'dart:math';
 import 'base_controller.dart';
 
 class DivisionGameController extends BaseGameController {
+  final _random = Random();
+
   @override
   void generateNewQuestion() {
     if (!isGameActive) return;
@@ -14,6 +17,23 @@ class DivisionGameController extends BaseGameController {
 
     currentNumbers = [num1, num2];
     correctAnswer = answer;
+
+    generateOptions(); // Generate options for multiple-choice
+  }
+
+  @override
+  void generateOptions() {
+    options = [correctAnswer];
+    while (options.length < 4) {
+      int wrongAnswer = correctAnswer + (_random.nextInt(5) - 2);
+      if (wrongAnswer <= 0 || options.contains(wrongAnswer)) {
+        wrongAnswer = correctAnswer + (_random.nextInt(10) + 1);
+      }
+      if (wrongAnswer > 0 && !options.contains(wrongAnswer)) {
+        options.add(wrongAnswer);
+      }
+    }
+    options.shuffle();
   }
 
   @override

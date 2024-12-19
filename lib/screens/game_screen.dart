@@ -165,8 +165,11 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final UserModel user = userModel;
 
-    // Determine if this is an options-based game
-    final bool isOptionsGame = gameName == 'Sum Sprint' || gameName == 'Minus Mastery';
+    // Update the isOptionsGame check to include Mul Hero
+    final bool isOptionsGame = gameName == 'Sum Sprint' || 
+                             gameName == 'Minus Mastery' || 
+                             gameName == 'Mul Hero' ||
+                             gameName == 'Div Genius'; // Add 'Div Genius'
 
     return Scaffold( // Remove WillPopScope
       appBar: GameTimerBar(
