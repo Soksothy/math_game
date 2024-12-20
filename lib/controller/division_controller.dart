@@ -9,11 +9,11 @@ class DivisionGameController extends BaseGameController {
     if (!isGameActive) return;
 
     double difficulty = getDifficultyMultiplier();
-    int maxNumber = (10 * difficulty).round();
-
-    int num2 = getRandomNumber(1, maxNumber);
-    int answer = getRandomNumber(1, maxNumber);
-    int num1 = num2 * answer; // Ensure clean division
+    // Limit divisor to single digit (1-9)
+    int num2 = getRandomNumber(1, min(9, (5 * difficulty).round()));
+    // Limit quotient to ensure product stays within two digits
+    int answer = getRandomNumber(1, min(9, (7 * difficulty).round()));
+    int num1 = num2 * answer; // Will result in max 2-digit number
 
     currentNumbers = [num1, num2];
     correctAnswer = answer;

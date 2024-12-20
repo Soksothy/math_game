@@ -21,7 +21,8 @@ class QuestionDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      constraints: const BoxConstraints(minHeight: 60.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.0),
@@ -35,10 +36,13 @@ class QuestionDisplay extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            question,
-            style: textStyle,
+          Flexible(
+            child: Text(
+              question,
+              style: textStyle,
+            ),
           ),
           const SizedBox(width: 10),
           AnswerInputContainer(
