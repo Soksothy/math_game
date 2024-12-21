@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             Navigator.pushNamed(
                               context, 
-                              '/game',  // Changed back from '/add-it-up' to '/game'
+                              '/game',
                               arguments: {
                                 'userModel': user,
                                 'gameType': 'addition',

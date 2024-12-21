@@ -6,13 +6,15 @@ import 'package:math_game/controller/game_factory.dart';
 import 'package:math_game/widgets/number_pad.dart';
 import 'package:math_game/widgets/answer_controls.dart';
 import 'package:math_game/widgets/question_display.dart';
-import 'package:math_game/widgets/question_header.dart';  // Add this import
-import 'package:math_game/widgets/answer_options.dart'; // Add this import
+import 'package:math_game/widgets/question_header.dart';
+import 'package:math_game/widgets/answer_options.dart';
 import 'dart:async';
 import 'package:logger/logger.dart';
-import 'package:math_game/services/user_storage.dart'; // Add this import
-import 'package:math_game/widgets/plus_grid.dart'; // Add this import
-import 'package:math_game/controller/plus_grid_controller.dart'; // Add this import
+import 'package:math_game/services/user_storage.dart';
+import 'package:math_game/widgets/plus_grid.dart';
+import 'package:math_game/controller/plus_grid_controller.dart';
+import 'package:math_game/widgets/minus_grid.dart';
+import 'package:math_game/controller/minus_grid_controller.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -23,38 +25,33 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   late BaseGameController gameController;
-  late int initialDuration;  // Changed to late
-  int remainingSeconds = 10;  // To display remaining time
+  late int initialDuration;
+  int remainingSeconds = 10;
   int stars = 0;
   bool isAnswerSelected = false;
   String currentInput = '';
   bool? isCorrectAnswer;
   final logger = Logger();
-  late String gameName; // Add this variable
-  int questionIndex = 0; // Add this variable to track the current question index
-  late UserModel userModel; // Add this variable to store the user model
+  late String gameName;
+  int questionIndex = 0;
+  late UserModel userModel;
   DateTime? startTime;
   Duration totalTime = Duration.zero;
-  late Map<String, dynamic> args; // Add this line near the top with other late variables
+  late Map<String, dynamic> args;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     startTime = DateTime.now();
-    // Remove the custom timer initialization
   }
 
   @override
   void dispose() {
-    // Remove the custom timer cancellation
     gameController.endGame();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
-
-  // Remove the custom startTimer and timeUp methods
-  // ...existing code...
 
   void moveToNextQuestion() {
     if (!mounted) return;
@@ -64,29 +61,24 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         isAnswerSelected = false;
         isCorrectAnswer = null;
         currentInput = '';
-        remainingSeconds = initialDuration; // Reset to initial duration
-        questionIndex += 1; // Increment the question index
+        remainingSeconds = initialDuration;
+        questionIndex += 1;
       });
     } else {
-      // Game ends
       gameController.endGame();
       totalTime = DateTime.now().difference(startTime!);
-
-      // Save updated user data
-      UserStorage.saveUser(userModel); // Add this line
-
-      // Navigate to results screen
+      UserStorage.saveUser(userModel);
       Navigator.pushReplacementNamed(
         context,
         '/results',
         arguments: {
-          'userModel': userModel, // Ensure updated userModel is passed
+          'userModel': userModel,
           'stars': stars,
           'gameName': gameName,
-          'gameType': args['gameType'], // Add this line
+          'gameType': args['gameType'],
           'totalQuestions': gameController.totalQuestions,
           'totalTime': totalTime,
-          'coinsEarned': stars * 10, // Pass coins earned
+          'coinsEarned': stars * 10,
         },
       );
     }
@@ -97,19 +89,15 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     super.didChangeDependencies();
     args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final String gameType = args['gameType'];
-    gameName = args['gameName']; // Get the game name
-    userModel = args['userModel']; // Get the user model
-
-    // Set initial duration based on game type
-    initialDuration = gameName == 'Plus Grid' ? 30 : 10;
-    remainingSeconds = initialDuration;  // Update remaining seconds
-
+    gameName = args['gameName'];
+    userModel = args['userModel'];
+    initialDuration = gameName == 'Plus Grid' ? 30 : gameName == 'Minus Grid' ? 20 : 10;
+    remainingSeconds = initialDuration;
     gameController = GameControllerFactory.createController(
       gameType,
-      gameName: gameName, // Pass the game name to factory
+      gameName: gameName,
     );
     gameController.startGame();
-    // Remove startTimer(); // Start timer when game starts
   }
 
   void handleAnswer(int number) {
@@ -130,8 +118,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
         isAnswerSelected = true;
         isCorrectAnswer = gameController.checkAnswer(answer);
         if (isCorrectAnswer!) {
-          stars++; // Only increment local stars counter
-          // Remove the user.stars update from here
+          stars++;
         }
       });
 
@@ -160,7 +147,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     if (!isAnswerSelected) {
       setState(() {
         isAnswerSelected = true;
-        isCorrectAnswer = false; // Mark as incorrect if time runs out
+        isCorrectAnswer = false;
       });
 
       Future.delayed(const Duration(seconds: 1), () {
@@ -173,20 +160,20 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final UserModel user = userModel;
-
     final bool isOptionsGame = gameName == 'Sum Sprint' || 
                              gameName == 'Minus Mastery' || 
                              gameName == 'Mul Hero' ||
                              gameName == 'Div Genius';
-
-    final bool isPlusGridGame = gameName == 'Plus Grid';  // Add this line
+    final bool isPlusGridGame = gameName == 'Plus Grid';
+    final bool isMinusGridGame = gameName == 'Minus Grid';
+    final bool isGridGame = isPlusGridGame || isMinusGridGame;
 
     return Scaffold(
       appBar: GameTimerBar(
-        key: ValueKey(questionIndex), // Add a unique key based on questionIndex
+        key: ValueKey(questionIndex),
         user: user,
         stars: stars,
-        duration: initialDuration, // Use fixed initial duration
+        duration: initialDuration,
         onTimerComplete: timeUp,
         onTimeChange: (time) {
           if (!mounted) return;
@@ -198,7 +185,6 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             }
           });
         },
-        // Remove leading property
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -212,23 +198,41 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (isPlusGridGame) ...[
-                    PlusGrid(
-                      controller: gameController as PlusGridController,
-                      onAnswerValidated: (isCorrect) {
-                        setState(() {
-                          isAnswerSelected = true;
-                          isCorrectAnswer = isCorrect;
-                          if (isCorrect) {
-                            stars++;
-                          }
-                        });
-                        Future.delayed(const Duration(seconds: 1), () {
-                          if (!mounted) return;
-                          moveToNextQuestion();
-                        });
-                      },
-                    ),
+                  if (isGridGame) ...[
+                    if (isPlusGridGame)
+                      PlusGrid(
+                        controller: gameController as PlusGridController,
+                        onAnswerValidated: (isCorrect) {
+                          setState(() {
+                            isAnswerSelected = true;
+                            isCorrectAnswer = isCorrect;
+                            if (isCorrect) {
+                              stars++;
+                            }
+                          });
+                          Future.delayed(const Duration(seconds: 1), () {
+                            if (!mounted) return;
+                            moveToNextQuestion();
+                          });
+                        },
+                      )
+                    else
+                      MinusGrid(
+                        controller: gameController as MinusGridController,
+                        onAnswerValidated: (isCorrect) {
+                          setState(() {
+                            isAnswerSelected = true;
+                            isCorrectAnswer = isCorrect;
+                            if (isCorrect) {
+                              stars++;
+                            }
+                          });
+                          Future.delayed(const Duration(seconds: 1), () {
+                            if (!mounted) return;
+                            moveToNextQuestion();
+                          });
+                        },
+                      ),
                   ] else ...[
                     QuestionDisplay(
                       question: gameController.getQuestionText(),
@@ -257,7 +261,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               ),
             ),
             const SizedBox(height: 20),
-            if (!isOptionsGame && !isPlusGridGame) ...[  // Modified this condition
+            if (!isOptionsGame && !isGridGame) ...[
               AnswerControls(
                 onClear: clearInput,
                 onSubmit: submitAnswer,

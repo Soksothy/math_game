@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import '../controller/plus_grid_controller.dart';
+import '../controller/minus_grid_controller.dart';
 import 'number_pad.dart';
 
-class PlusGrid extends StatefulWidget {
-  final PlusGridController controller;
+class MinusGrid extends StatefulWidget {
+  final MinusGridController controller;
   final Function(bool) onAnswerValidated;
 
-  const PlusGrid({
+  const MinusGrid({
     super.key,
     required this.controller,
     required this.onAnswerValidated,
   });
 
   @override
-  State<PlusGrid> createState() => _PlusGridState();
+  State<MinusGrid> createState() => _MinusGridState();
 }
 
-class _PlusGridState extends State<PlusGrid> {
+class _MinusGridState extends State<MinusGrid> {
   late List<FocusNode> focusNodes;
   int currentFocusIndex = 0;
   List<TextEditingController> textControllers = [];
@@ -35,21 +35,17 @@ class _PlusGridState extends State<PlusGrid> {
   }
 
   @override
-  void didUpdateWidget(PlusGrid oldWidget) {
+  void didUpdateWidget(MinusGrid oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Reset controllers when question changes
     int maxLength = widget.controller.getMaxLength();
     if (textControllers.length != maxLength) {
-      // Dispose old controllers
       for (var controller in textControllers) {
         controller.dispose();
       }
-      
       textControllers = List.generate(maxLength, (index) => TextEditingController());
       focusNodes = List.generate(maxLength, (index) => FocusNode());
-      currentFocusIndex = maxLength - 1; // Reset to rightmost position
+      currentFocusIndex = maxLength - 1;
     } else {
-      
       for (var controller in textControllers) {
         controller.clear();
       }
@@ -73,32 +69,26 @@ class _PlusGridState extends State<PlusGrid> {
 
     setState(() {
       widget.controller.userAnswers[columnIndex] = digit;
-      if (widget.controller.checkCarryOver(columnIndex)) {
-        widget.controller.carryOvers[columnIndex + 1] = 1;
+      if (widget.controller.checkBorrow(columnIndex)) {
+        widget.controller.borrowedNumbers[columnIndex + 1] = 1;
       }
     });
 
-    // Check if all answers are filled
     if (!widget.controller.userAnswers.contains(null)) {
       bool isCorrect = widget.controller.validateFullAnswer();
       widget.onAnswerValidated(isCorrect);
-      
-      // Clear answers after delay
       Future.delayed(const Duration(seconds: 1), () {
         if (!mounted) return;
-        // Clear all inputs
         for (var controller in textControllers) {
           controller.clear();
         }
-        // Reset carry-overs and user answers
         setState(() {
-          widget.controller.carryOvers = List.filled(widget.controller.getMaxLength() + 1, null);
+          widget.controller.borrowedNumbers = List.filled(widget.controller.getMaxLength() + 1, null);
           widget.controller.userAnswers = List.filled(widget.controller.getMaxLength(), null);
-          currentFocusIndex = widget.controller.getMaxLength() - 1; // Reset to rightmost position
+          currentFocusIndex = widget.controller.getMaxLength() - 1;
         });
       });
     } else if (currentFocusIndex > 0) {
-  
       setState(() {
         currentFocusIndex--;
         focusNodes[currentFocusIndex].requestFocus();
@@ -111,33 +101,28 @@ class _PlusGridState extends State<PlusGrid> {
 
     setState(() {
       textControllers[currentFocusIndex].text = number.toString();
-      
       widget.controller.userAnswers[textControllers.length - 1 - currentFocusIndex] = number;
-      
-      // Check for carry over
-      if (widget.controller.checkCarryOver(textControllers.length - 1 - currentFocusIndex)) {
-        int carryOverIndex = textControllers.length - currentFocusIndex;
-        if (carryOverIndex < widget.controller.carryOvers.length) {
-          widget.controller.carryOvers[carryOverIndex] = 1;
+
+      if (widget.controller.checkBorrow(textControllers.length - 1 - currentFocusIndex)) {
+        int borrowIndex = textControllers.length - currentFocusIndex;
+        if (borrowIndex < widget.controller.borrowedNumbers.length) {
+          widget.controller.borrowedNumbers[borrowIndex] = 1;
         }
       }
-      
+
       if (!widget.controller.userAnswers.contains(null)) {
         bool isCorrect = widget.controller.validateFullAnswer();
         widget.onAnswerValidated(isCorrect);
-        
         if (isCorrect) {
           _showFeedback(true);
         } else {
           _showFeedback(false);
         }
-        
         Future.delayed(const Duration(seconds: 1), () {
           if (!mounted) return;
           _resetInputs();
         });
       } else if (currentFocusIndex > 0) {
-        
         currentFocusIndex--;
       }
     });
@@ -148,9 +133,8 @@ class _PlusGridState extends State<PlusGrid> {
       for (var controller in textControllers) {
         controller.clear();
       }
-      widget.controller.carryOvers = List.filled(widget.controller.getMaxLength() + 1, null);
+      widget.controller.borrowedNumbers = List.filled(widget.controller.getMaxLength() + 1, null);
       widget.controller.userAnswers = List.filled(widget.controller.getMaxLength(), null);
-    
       currentFocusIndex = textControllers.length - 1;
     });
   }
@@ -184,15 +168,11 @@ class _PlusGridState extends State<PlusGrid> {
     if (!widget.controller.userAnswers.contains(null)) {
       bool isCorrect = widget.controller.validateFullAnswer();
       widget.onAnswerValidated(isCorrect);
-      
-      // Show feedback for correct or incorrect answer
       if (isCorrect) {
         _showFeedback(true);
       } else {
         _showFeedback(false);
       }
-      
-      // Clear answers after delay
       Future.delayed(const Duration(seconds: 1), () {
         if (!mounted) return;
         _resetInputs();
@@ -205,11 +185,11 @@ class _PlusGridState extends State<PlusGrid> {
     final int maxLength = widget.controller.getMaxLength();
     final digits1Padded = List.filled(maxLength, -1);
     final digits2Padded = List.filled(maxLength, -1);
-    
+
     for (int i = 0; i < widget.controller.digits1.length; i++) {
       digits1Padded[maxLength - 1 - i] = widget.controller.digits1[widget.controller.digits1.length - 1 - i];
     }
-    
+
     for (int i = 0; i < widget.controller.digits2.length; i++) {
       digits2Padded[maxLength - 1 - i] = widget.controller.digits2[widget.controller.digits2.length - 1 - i];
     }
@@ -233,7 +213,6 @@ class _PlusGridState extends State<PlusGrid> {
           ),
           child: Column(
             children: [
-              // First number row
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -260,14 +239,13 @@ class _PlusGridState extends State<PlusGrid> {
                 ],
               ),
               const SizedBox(height: 16),
-              // Operation symbol row
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(right: (maxLength - 1) * 64.0), // Changed from left to right padding
+                    padding: EdgeInsets.only(right: (maxLength - 1) * 64.0),
                     child: const Text(
-                      '+',
+                      '-',
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
@@ -278,7 +256,6 @@ class _PlusGridState extends State<PlusGrid> {
                 ],
               ),
               const SizedBox(height: 16),
-              // Second number row
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -287,14 +264,14 @@ class _PlusGridState extends State<PlusGrid> {
                       width: 48, 
                       height: 48, 
                       margin: const EdgeInsets.symmetric(horizontal: 8), 
-                      alignment: Alignment.center,  // Added alignment
+                      alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: digits2Padded[i] == -1 ? Colors.transparent : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: digits2Padded[i] == -1 
                         ? null 
-                        : Center(  // Wrapped Text in Center widget
+                        : Center(
                             child: Text(
                               digits2Padded[i].toString(),
                               style: const TextStyle(
@@ -320,7 +297,7 @@ class _PlusGridState extends State<PlusGrid> {
                       child: Container(
                         width: 48, 
                         height: 48, 
-                        margin: const EdgeInsets.symmetric(horizontal: 8), // increased from 4
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: currentFocusIndex == i 
@@ -385,7 +362,6 @@ class _PlusGridState extends State<PlusGrid> {
     );
   }
 
-  // Update back button handler
   void handleBack() {
     if (currentFocusIndex > 0) {
       setState(() {
