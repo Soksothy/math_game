@@ -202,10 +202,7 @@ class _PlusGridState extends State<PlusGrid> {
 
   @override
   Widget build(BuildContext context) {
-    // Get the longest number length to determine grid width
     final int maxLength = widget.controller.getMaxLength();
-    
-    // Create padded arrays for proper alignment
     final digits1Padded = List.filled(maxLength, -1);
     final digits2Padded = List.filled(maxLength, -1);
     
@@ -236,36 +233,15 @@ class _PlusGridState extends State<PlusGrid> {
           ),
           child: Column(
             children: [
-              // Carry over row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  for (int i = 0; i < maxLength; i++)
-                    Container(
-                      width: 40,
-                      height: 30,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      alignment: Alignment.center,
-                      child: Text(
-                        widget.controller.carryOvers[i]?.toString() ?? '',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
               // First number row
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   for (int i = 0; i < maxLength; i++)
                     Container(
-                      width: 48, // increased from 40
-                      height: 48, // increased from 40
-                      margin: const EdgeInsets.symmetric(horizontal: 8), // increased from 4
+                      width: 48,
+                      height: 48,
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: digits1Padded[i] == -1 ? Colors.transparent : Colors.white,
@@ -311,17 +287,20 @@ class _PlusGridState extends State<PlusGrid> {
                       width: 48, 
                       height: 48, 
                       margin: const EdgeInsets.symmetric(horizontal: 8), 
+                      alignment: Alignment.center,  // Added alignment
                       decoration: BoxDecoration(
                         color: digits2Padded[i] == -1 ? Colors.transparent : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: digits2Padded[i] == -1 
                         ? null 
-                        : Text(
-                            digits2Padded[i].toString(),
-                            style: const TextStyle(
-                              fontSize: 32, 
-                              fontFamily: 'Swiss',
+                        : Center(  // Wrapped Text in Center widget
+                            child: Text(
+                              digits2Padded[i].toString(),
+                              style: const TextStyle(
+                                fontSize: 32, 
+                                fontFamily: 'Swiss',
+                              ),
                             ),
                           ),
                     ),
