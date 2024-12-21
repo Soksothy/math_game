@@ -91,7 +91,8 @@ class PlusGridController extends BaseGameController {
   }
 
   @override
-  bool checkAnswer(int userAnswer) {
+  bool checkAnswer(dynamic userAnswer) {
+    if (userAnswer is! int) return false;
     return userAnswer == correctAnswer;
   }
 

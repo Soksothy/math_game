@@ -15,6 +15,8 @@ import 'package:math_game/widgets/plus_grid.dart';
 import 'package:math_game/controller/plus_grid_controller.dart';
 import 'package:math_game/widgets/minus_grid.dart';
 import 'package:math_game/controller/minus_grid_controller.dart';
+import 'package:math_game/widgets/judgement_question.dart';
+import 'package:math_game/controller/judgement_controller.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -167,6 +169,10 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     final bool isPlusGridGame = gameName == 'Plus Grid';
     final bool isMinusGridGame = gameName == 'Minus Grid';
     final bool isGridGame = isPlusGridGame || isMinusGridGame;
+    final bool isJudgementGame = gameName == 'Judgement' || 
+                                gameName == 'Judge It' || 
+                                gameName == 'Perfect Mul' ||
+                                gameName == 'Side Quest';
 
     return Scaffold(
       appBar: GameTimerBar(
@@ -233,6 +239,32 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                           });
                         },
                       ),
+                  ] else if (isJudgementGame) ...[
+                    JudgementQuestion(
+                      questionText: gameController.getQuestionText(),
+                      onAnswerSelected: (bool answer) {
+                        if (isAnswerSelected) return;
+                        
+                        final judgementController = gameController as JudgementController;
+                        bool isCorrect = judgementController.checkAnswer(answer);
+                        
+                        setState(() {
+                          isAnswerSelected = true;
+                          isCorrectAnswer = isCorrect;
+                          if (isCorrect) {
+                            stars++;
+                          }
+                        });
+
+                        Future.delayed(const Duration(seconds: 1), () {
+                          if (!mounted) return;
+                          moveToNextQuestion();
+                        });
+                      },
+                      isEnabled: !isAnswerSelected,
+                      correctCount: (gameController as JudgementController).correctCount,
+                      wrongCount: (gameController as JudgementController).wrongCount,
+                    ),
                   ] else ...[
                     QuestionDisplay(
                       question: gameController.getQuestionText(),
@@ -261,7 +293,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               ),
             ),
             const SizedBox(height: 20),
-            if (!isOptionsGame && !isGridGame) ...[
+            if (!isOptionsGame && !isGridGame && !isJudgementGame) ...[
               AnswerControls(
                 onClear: clearInput,
                 onSubmit: submitAnswer,

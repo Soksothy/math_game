@@ -319,7 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               arguments: {
                                 'userModel': user,
                                 'gameType': 'subtraction',
-                                'gameName': 'Judgement'
+                                'gameName': 'Judge It'
                               }
                             );
                           },
@@ -336,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               Image.asset('lib/asset/sub4.png', width: 80, height: 80), // Increased size
                               const SizedBox(height: 8),
-                              const Text('Judgement'),
+                              const Text('Judge It'),
                             ],
                           ),
                         ),

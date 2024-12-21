@@ -5,6 +5,7 @@ import 'multiplication_controller.dart';
 import 'division_controller.dart';
 import 'plus_grid_controller.dart';
 import 'minus_grid_controller.dart';
+import 'judgement_controller.dart';
 
 class GameControllerFactory {
   static BaseGameController createController(String gameType, {String? gameName}) {
@@ -13,6 +14,18 @@ class GameControllerFactory {
     }
     if (gameName == 'Minus Grid') {
       return MinusGridController();
+    }
+    if (gameName == 'Judgement') {
+      return JudgementController(gameType: 'addition');
+    }
+    if (gameName == 'Judge It') {
+      return JudgementController(gameType: 'subtraction');
+    }
+    if (gameName == 'Perfect Mul') {
+      return JudgementController(gameType: 'multiplication');
+    }
+    if (gameName == 'Side Quest') {
+      return JudgementController(gameType: 'division');
     }
     
     switch (gameType.toLowerCase()) {

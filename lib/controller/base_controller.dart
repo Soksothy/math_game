@@ -49,8 +49,11 @@ abstract class BaseGameController {
     options.shuffle();
   }
 
-  bool checkAnswer(int userAnswer) {
-    return userAnswer == correctAnswer;
+  bool checkAnswer(dynamic userAnswer) {
+    if (userAnswer is int) {
+      return userAnswer == correctAnswer;
+    }
+    return false;
   }
 
   void endGame() {
