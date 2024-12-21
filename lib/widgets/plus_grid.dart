@@ -350,25 +350,43 @@ class _PlusGridState extends State<PlusGrid> {
             ],
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 35),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ElevatedButton(
               onPressed: clearCurrentInput,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade100,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                backgroundColor: const Color(0xFF74CF48),
+                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
-              child: const Text('Clear'),
+              child: const Text(
+                'Delete',
+                style: TextStyle(
+                  fontSize: 24,
+                  color: Colors.white,
+                ),
+              ),
             ),
             ElevatedButton(
               onPressed: handleSubmit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green.shade100,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                backgroundColor: const Color(0xFF74CF48),
+                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
-              child: const Text('Submit'),
+              child: const Text(
+                'Submit',
+                style: TextStyle(
+                  fontSize: 24,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ],
         ),
