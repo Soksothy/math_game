@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               arguments: {
                                 'userModel': user,
                                 'gameType': 'addition',
-                                'gameName': 'Add It Up'
+                                'gameName': ''
                               }
                             );
                           },
@@ -153,18 +153,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 120,
                             margin: const EdgeInsets.only(right: 8),
                             decoration: BoxDecoration(
-                             color: const Color.fromARGB(255, 254, 158, 158),
-                            borderRadius  : BorderRadius.circular(8),
+                              color: const Color.fromARGB(255, 254, 158, 158),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset('lib/asset/add3.png', width: 80, height: 80),
+                                const SizedBox(height: 8),
+                                const Text('Plus Grid'),
+                              ],
+                            ),
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset('lib/asset/add3.png', width: 80, height: 80), // Increased size
-                              const SizedBox(height: 8),
-                              const Text('Plus Grid'),
-                            ],
-                          ),
-                        ),
                         ),
                         GestureDetector(
                           onTap: () {

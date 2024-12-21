@@ -11,6 +11,8 @@ import 'package:math_game/widgets/answer_options.dart'; // Add this import
 import 'dart:async';
 import 'package:logger/logger.dart';
 import 'package:math_game/services/user_storage.dart'; // Add this import
+import 'package:math_game/widgets/plus_grid.dart'; // Add this import
+import 'package:math_game/controller/plus_grid_controller.dart'; // Add this import
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -21,7 +23,7 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   late BaseGameController gameController;
-  final int initialDuration = 10;  // Fixed duration per question
+  late int initialDuration;  // Changed to late
   int remainingSeconds = 10;  // To display remaining time
   int stars = 0;
   bool isAnswerSelected = false;
@@ -98,7 +100,14 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     gameName = args['gameName']; // Get the game name
     userModel = args['userModel']; // Get the user model
 
-    gameController = GameControllerFactory.createController(gameType);
+    // Set initial duration based on game type
+    initialDuration = gameName == 'Plus Grid' ? 30 : 10;
+    remainingSeconds = initialDuration;  // Update remaining seconds
+
+    gameController = GameControllerFactory.createController(
+      gameType,
+      gameName: gameName, // Pass the game name to factory
+    );
     gameController.startGame();
     // Remove startTimer(); // Start timer when game starts
   }
@@ -165,13 +174,14 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final UserModel user = userModel;
 
-    // Update the isOptionsGame check to include Mul Hero
     final bool isOptionsGame = gameName == 'Sum Sprint' || 
                              gameName == 'Minus Mastery' || 
                              gameName == 'Mul Hero' ||
-                             gameName == 'Div Genius'; // Add 'Div Genius'
+                             gameName == 'Div Genius';
 
-    return Scaffold( // Remove WillPopScope
+    final bool isPlusGridGame = gameName == 'Plus Grid';  // Add this line
+
+    return Scaffold(
       appBar: GameTimerBar(
         key: ValueKey(questionIndex), // Add a unique key based on questionIndex
         user: user,
@@ -202,33 +212,52 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  QuestionDisplay(
-                    question: gameController.getQuestionText(),
-                    userInput: isOptionsGame ? '?' : currentInput,
-                    isCorrect: isCorrectAnswer,
-                    textStyle: const TextStyle(
-                      fontFamily: 'Swiss',
-                      fontSize: 45,
+                  if (isPlusGridGame) ...[
+                    PlusGrid(
+                      controller: gameController as PlusGridController,
+                      onAnswerValidated: (isCorrect) {
+                        setState(() {
+                          isAnswerSelected = true;
+                          isCorrectAnswer = isCorrect;
+                          if (isCorrect) {
+                            stars++;
+                          }
+                        });
+                        Future.delayed(const Duration(seconds: 1), () {
+                          if (!mounted) return;
+                          moveToNextQuestion();
+                        });
+                      },
                     ),
-                    inputTextStyle: const TextStyle(
-                      fontFamily: 'Swiss',
-                      fontSize: 32,
+                  ] else ...[
+                    QuestionDisplay(
+                      question: gameController.getQuestionText(),
+                      userInput: isOptionsGame ? '?' : currentInput,
+                      isCorrect: isCorrectAnswer,
+                      textStyle: const TextStyle(
+                        fontFamily: 'Swiss',
+                        fontSize: 45,
+                      ),
+                      inputTextStyle: const TextStyle(
+                        fontFamily: 'Swiss',
+                        fontSize: 32,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  if (isOptionsGame)
-                    AnswerOptions(
-                      options: gameController.getCurrentQuestion().options,
-                      onOptionSelected: handleOptionSelected,
-                      isEnabled: !isAnswerSelected,
-                      optionSize: 80,
-                      rows: 2,
-                    ),
+                    const SizedBox(height: 20),
+                    if (isOptionsGame)
+                      AnswerOptions(
+                        options: gameController.getCurrentQuestion().options,
+                        onOptionSelected: handleOptionSelected,
+                        isEnabled: !isAnswerSelected,
+                        optionSize: 80,
+                        rows: 2,
+                      ),
+                  ],
                 ],
               ),
             ),
             const SizedBox(height: 20),
-            if (!isOptionsGame) ...[
+            if (!isOptionsGame && !isPlusGridGame) ...[  // Modified this condition
               AnswerControls(
                 onClear: clearInput,
                 onSubmit: submitAnswer,
