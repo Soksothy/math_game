@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/leaderboard_screen.dart';
+import '../screens/profile_screen.dart'; // Add this import
 import '../models/user_model.dart';  // Add this import
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -70,7 +71,14 @@ class CustomBottomNavigationBar extends StatelessWidget {
     final isSelected = selectedIndex == index;
     return InkWell(
       onTap: () {
-        if (index == 3 && !isSelected) {
+        if (index == 1 && !isSelected) {
+          if (user != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfileScreen(user: user!)),
+            );
+          }
+        } else if (index == 3 && !isSelected) {
           if (user != null) {
             Navigator.push(
               context,
