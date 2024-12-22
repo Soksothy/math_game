@@ -91,24 +91,32 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
     );
   }
 
+  void updateUserStats(UserModel user, String gameType, int stars, int totalQuestions) {
+    // Update topic scores with actual stars earned
+    user.updateTopicScore(gameType, stars);
+    
+    // Save user data
+    UserStorage.saveUser(user);
+  }
+
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final UserModel user = args['userModel'];
     final int stars = args['stars'] ?? 0;
     final Duration totalTime = args['totalTime'] ?? Duration.zero;
+    final int totalQuestions = args['totalQuestions'] ?? 10; // Add this line
 
     // Store initial level on first build
     _initialLevel ??= user.level;
 
     // Update user stats only once
     if (!_hasUpdatedStats) {
-      final prevStars = user.stars;
+      updateUserStats(user, args['gameType'], stars, totalQuestions);
       user.stars += stars;
       
-      // Calculate level progress with new total stars
-      final levelProgress = LevelCalculator.calculateProgress(user.stars);
-      final int newLevel = (user.stars / 10).floor() + 1; // Changed from 5 to 10 stars per level
+      // Calculate new level based on total stars
+      final int newLevel = (user.stars / 10).floor() + 1;
       
       if (newLevel > user.level) {
         user.level = newLevel;

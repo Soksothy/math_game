@@ -34,8 +34,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void _initializeUser() async {
     final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
-    if (args != null && args.containsKey('userModel')) {
-      user = args['userModel'] as UserModel;
+    if (args != null) {
+      if (args.containsKey('userModel')) {
+        user = args['userModel'] as UserModel;
+      }
+      if (args.containsKey('selectedIndex')) {
+        _selectedIndex = args['selectedIndex'] as int;
+      }
     } else {
       user = await UserStorage.getUser() ?? UserModel.defaultUser();
     }
@@ -590,6 +595,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _selectedIndex = index;
           });
         },
+        user: user,  // Add this line
       ),
     );
   }

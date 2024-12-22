@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import '../screens/leaderboard_screen.dart';
+import '../models/user_model.dart';  // Add this import
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onIndexChanged;
+  final UserModel? user;  // Add user property
 
   const CustomBottomNavigationBar({
     super.key,
     required this.selectedIndex,
     required this.onIndexChanged,
+    this.user,  // Add this parameter
   });
 
   @override
@@ -42,8 +46,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildNavItem('cart.png', 0),
-            _buildNavItem('profile.png', 1),
+            _buildNavItem(context, 'cart.png', 0),
+            _buildNavItem(context, 'profile.png', 1),
             SizedBox(
               width: 55, // Increased from 50
               height: 55, // Increased from 50
@@ -54,18 +58,28 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 hoverColor: Colors.orange.withOpacity(0.1),
               ),
             ),
-            _buildNavItem('leaderboard.png', 3),
-            _buildNavItem('settings.png', 4),
+            _buildNavItem(context, 'leaderboard.png', 3),
+            _buildNavItem(context, 'settings.png', 4),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildNavItem(String asset, int index) {
+  Widget _buildNavItem(BuildContext context, String asset, int index) {
     final isSelected = selectedIndex == index;
     return InkWell(
-      onTap: () => onIndexChanged(index),
+      onTap: () {
+        if (index == 3 && !isSelected) {
+          if (user != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LeaderboardScreen(user: user!)),
+            );
+          }
+        }
+        onIndexChanged(index);
+      },
       borderRadius: BorderRadius.circular(12),
       splashColor: Colors.orange.withOpacity(0.3),
       highlightColor: Colors.orange.withOpacity(0.1),

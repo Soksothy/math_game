@@ -9,7 +9,7 @@ class UserModel {
   int highestScore;
   DateTime lastPlayedAt;
   List<String> achievementsUnlocked;
-  Map<String, int> topicScores; // Store scores for different math topics
+  Map<String, dynamic> topicScores; // Changed from Map<String, int> to allow both int and double
 
   // Constructor
   UserModel({
@@ -23,7 +23,7 @@ class UserModel {
     this.highestScore = 0,
     DateTime? lastPlayedAt,
     List<String>? achievementsUnlocked,
-    Map<String, int>? topicScores,
+    Map<String, dynamic>? topicScores, // Updated type
   })  : assert(age > 0 && age < 120, 'Age must be between 1 and 120'),
         assert(avatarIndex >= 0, 'Avatar index must be non-negative'),
         lastPlayedAt = lastPlayedAt ?? DateTime.now(),
@@ -53,10 +53,16 @@ class UserModel {
   }
 
   // Update topic score
-  void updateTopicScore(String topic, int score) {
-    if (!topicScores.containsKey(topic) || score > topicScores[topic]!) {
-      topicScores[topic] = score;
-    }
+  void updateTopicScore(String topic, int starsEarned) {
+    // Track attempts as integer
+    String attemptKey = topic;
+    int currentAttempts = (topicScores[attemptKey] as int?) ?? 0;
+    topicScores[attemptKey] = currentAttempts + 1;
+    
+    // Track total stars for this topic
+    String starsKey = '${topic}_stars';
+    int currentStars = (topicScores[starsKey] as int?) ?? 0;
+    topicScores[starsKey] = currentStars + starsEarned;
   }
 
   // Get current level progress percentage
@@ -73,6 +79,12 @@ class UserModel {
       return true;
     }
     return false;
+  }
+
+  double getCategoryAverage(String category) {
+    final attempts = topicScores[category] ?? 0;
+    final totalStars = topicScores['${category}_stars'] ?? 0;
+    return attempts > 0 ? (totalStars / attempts) : 0.0;
   }
 
   // Convert to JSON
@@ -107,7 +119,7 @@ class UserModel {
             ? List<String>.from(json['achievementsUnlocked'])
             : [],
         topicScores: json['topicScores'] != null
-            ? Map<String, int>.from(json['topicScores'])
+            ? Map<String, dynamic>.from(json['topicScores'])
             : {},
       );
 
