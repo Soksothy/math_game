@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:math_game/models/user_model.dart';  // Add this import
+import 'package:math_game/models/user_model.dart'; 
 
 class CreateProfileScreen extends StatefulWidget {
   const CreateProfileScreen({super.key});
@@ -12,7 +12,7 @@ class CreateProfileScreenState extends State<CreateProfileScreen> {
   bool? isBoySelected; 
   String name = '';
   String? nameError;  
-  int selectedAvatarIndex = 0;  // Add this line
+  int selectedAvatarIndex = 0; 
 
   void validateName(String value) {
     setState(() {
@@ -87,14 +87,14 @@ class CreateProfileScreenState extends State<CreateProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-        const SizedBox(height: 44), // Adjusted margin at top
+        const SizedBox(height: 44),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             GestureDetector(
           onTap: () {
             setState(() {
-              isBoySelected = isBoySelected == true ? null : true; // Toggle between true and null
+              isBoySelected = isBoySelected == true ? null : true;
             });
           },
                 child: Row(
@@ -130,7 +130,7 @@ class CreateProfileScreenState extends State<CreateProfileScreen> {
               GestureDetector(
               onTap: () {
               setState(() {
-                isBoySelected = isBoySelected == false ? null : false; // Toggle between false and null
+                isBoySelected = isBoySelected == false ? null : false;
               });
               },
               child: Row(
@@ -211,7 +211,7 @@ class CreateProfileScreenState extends State<CreateProfileScreen> {
                   ),
                   fillColor: const Color(0xFFE5E5E5),
                   filled: true,
-                  counterText: '',  // Hides the built-in counter
+                  counterText: '',
                 ),
               ),
               AnimatedContainer(
@@ -256,7 +256,7 @@ class CreateProfileScreenState extends State<CreateProfileScreen> {
               } else {
                 final userModel = UserModel(
                   name: name,
-                  age: 5, // Default age, will be updated in next screen
+                  age: 5,
                   isBoy: isBoySelected!,
                   avatarIndex: selectedAvatarIndex,
                 );

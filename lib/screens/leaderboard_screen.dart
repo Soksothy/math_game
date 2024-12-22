@@ -219,16 +219,11 @@ class LeaderboardScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        selectedIndex: 3,
+        selectedIndex: 3, // Leaderboard is always index 3
         onIndexChanged: (index) {
-          if (index != 3) {
-            Navigator.pushReplacementNamed(
-              context,
-              '/home',
-              arguments: {'userModel': user},
-            );
-          }
+          // Navigation is handled in the bottom navigation bar widget
         },
+        user: user,
       ),
     );
   }

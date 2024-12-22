@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:math_game/models/user_model.dart';
-import 'package:math_game/services/user_storage.dart';  // Add this import
-
+import 'package:math_game/services/user_storage.dart';
 
 class CreateAgeScreen extends StatefulWidget {
   const CreateAgeScreen({super.key});
@@ -12,10 +11,10 @@ class CreateAgeScreen extends StatefulWidget {
 }
 
 class CreateAgeScreenState extends State<CreateAgeScreen> {
-  String age = '5';  // Changed from empty string to '5'
+  String age = '5';
   late UserModel userModel;
   bool isInitialized = false;
-  bool? isBoySelected;  // This will be initialized from userModel
+  bool? isBoySelected;
 
   @override
   void didChangeDependencies() {
@@ -23,7 +22,7 @@ class CreateAgeScreenState extends State<CreateAgeScreen> {
     if (!isInitialized) {
       final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
       userModel = args?['userModel'] as UserModel;
-      isBoySelected = userModel.isBoy;  // Set isBoySelected from userModel
+      isBoySelected = userModel.isBoy;
       isInitialized = true;
     }
   }
@@ -87,15 +86,14 @@ class CreateAgeScreenState extends State<CreateAgeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(height: 40), // Reduced from 44
-              // Display selected gender options (disabled)
+              const SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Container(  // Replace GestureDetector with Container since we don't want it to be interactive
+                  Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
-                      color: userModel.isBoy  // Use userModel.isBoy instead of isBoySelected
+                      color: userModel.isBoy
                           ? const Color(0xFF74CF48)
                           : const Color(0xFFE5E5E5),
                       borderRadius: BorderRadius.circular(15),
@@ -115,7 +113,7 @@ class CreateAgeScreenState extends State<CreateAgeScreen> {
                       ],
                     ),
                   ),
-                  Container(  // Replace GestureDetector with Container since we don't want it to be interactive
+                  Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
                       color: !userModel.isBoy
@@ -140,10 +138,9 @@ class CreateAgeScreenState extends State<CreateAgeScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 30), // Reduced from 50
-              // Avatar display
+              const SizedBox(height: 30),
               SizedBox(
-                height: 350, // Reduced from 400
+                height: 350,
                 child: PageView.builder(
                   itemCount: 13,
                   controller: PageController(
@@ -162,7 +159,7 @@ class CreateAgeScreenState extends State<CreateAgeScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 20), // Reduced from 35
+              const SizedBox(height: 20),
               AgeCarousel(
                 selectedAge: age,
                 onAgeSelected: (newAge) {
@@ -171,21 +168,16 @@ class CreateAgeScreenState extends State<CreateAgeScreen> {
                   });
                 },
               ),
-              const SizedBox(height: 20), // Reduced from 40
+              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.only(bottom: 20),
                 child: SizedBox(
                   width: 400,
                   child: ElevatedButton(
                     onPressed: () async {
-                      // Update age in userModel
                       userModel.age = int.parse(age);
-                      
-                      // Save user data
                       await UserStorage.saveUser(userModel);
-                      
                       if (mounted) {
-                        // Navigate to home screen
                         Navigator.of(context).pushNamedAndRemoveUntil(
                           '/home',
                           (Route<dynamic> route) => false,
@@ -243,7 +235,7 @@ class _AgeCarouselState extends State<AgeCarousel> {
   void initState() {
     super.initState();
     int initialPage = widget.selectedAge.isEmpty 
-        ? 3  // Changed from 0 to 3 (5-2=3) to show age 5 by default
+        ? 3
         : int.parse(widget.selectedAge) - minAge;
     _pageController = PageController(
       viewportFraction: 0.3,
@@ -350,7 +342,6 @@ class _AgeCarouselState extends State<AgeCarousel> {
       ],
     );
   }
-
 
   Widget _buildArrowButton(bool isNext) {
     return GestureDetector(

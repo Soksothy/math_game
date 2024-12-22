@@ -29,14 +29,11 @@ class GameTimerBar extends StatefulWidget implements PreferredSizeWidget {
 
 class _GameTimerBarState extends State<GameTimerBar> {
   late CountDownController _controller;
-  bool _isTimerRunning = false; // Add this flag
 
   @override
   void initState() {
     super.initState();
     _controller = CountDownController();
-    // Initialize the timer as running
-    _isTimerRunning = true;
   }
 
   @override
@@ -151,12 +148,9 @@ class _GameTimerBarState extends State<GameTimerBar> {
                         isReverse: true,
                         isReverseAnimation: true,
                         autoStart: true, // Set autoStart to true
-                        onStart: () {
-                          _isTimerRunning = true;
-                        },
+                        onStart: () {},
                         onChange: widget.onTimeChange, // Add this line
                         onComplete: () {
-                          _isTimerRunning = false; // Update the flag when timer completes
                           widget.onTimerComplete?.call();
                         },
                       ),

@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
-import '../screens/leaderboard_screen.dart';
-import '../screens/profile_screen.dart'; // Add this import
-import '../models/user_model.dart';  // Add this import
+import '../models/user_model.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onIndexChanged;
-  final UserModel? user;  // Add user property
+  final UserModel? user;
 
   const CustomBottomNavigationBar({
     super.key,
     required this.selectedIndex,
     required this.onIndexChanged,
-    this.user,  // Add this parameter
+    this.user,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 74, // Increased from 70 to 74
+      height: 74,
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
@@ -43,18 +41,27 @@ class CustomBottomNavigationBar extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6), // Reduced vertical padding
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildNavItem(context, 'cart.png', 0),
             _buildNavItem(context, 'profile.png', 1),
             SizedBox(
-              width: 55, // Increased from 50
-              height: 55, // Increased from 50
+              width: 55,
+              height: 55,
               child: IconButton(
-                icon: Image.asset('lib/asset/home.png', width: 35, height: 35), // Increased from 30
-                onPressed: () => onIndexChanged(2),
+                icon: Image.asset('lib/asset/home.png', width: 35, height: 35),
+                onPressed: () {
+                  onIndexChanged(2);
+                  if (user != null) {
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/home',
+                      (route) => false,
+                      arguments: {'userModel': user},
+                    );
+                  }
+                },
                 splashColor: Colors.orange.withOpacity(0.3),
                 hoverColor: Colors.orange.withOpacity(0.1),
               ),
@@ -71,29 +78,38 @@ class CustomBottomNavigationBar extends StatelessWidget {
     final isSelected = selectedIndex == index;
     return InkWell(
       onTap: () {
-        if (index == 1 && !isSelected) {
-          if (user != null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ProfileScreen(user: user!)),
-            );
-          }
-        } else if (index == 3 && !isSelected) {
-          if (user != null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => LeaderboardScreen(user: user!)),
-            );
-          }
-        }
         onIndexChanged(index);
+        if (user == null) return;
+        String route = '/home';
+        switch (index) {
+          case 0:
+            route = '/shop';
+            break;
+          case 1:
+            route = '/profile';
+            break;
+          case 2:
+            route = '/home';
+            break;
+          case 3:
+            route = '/leaderboard';
+            break;
+          case 4:
+            route = '/settings';
+            break;
+        }
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          route,
+          (route) => false,
+          arguments: {'userModel': user},
+        );
       },
       borderRadius: BorderRadius.circular(12),
       splashColor: Colors.orange.withOpacity(0.3),
       highlightColor: Colors.orange.withOpacity(0.1),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), // Reduced vertical padding
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: isSelected ? Colors.orange.withOpacity(0.1) : Colors.transparent,
@@ -103,12 +119,12 @@ class CustomBottomNavigationBar extends StatelessWidget {
           children: [
             Image.asset(
               'lib/asset/$asset',
-              width: 35, // Increased from 32
-              height: 35, // Increased from 32
+              width: 35,
+              height: 35,
             ),
             if (isSelected)
               Container(
-                margin: const EdgeInsets.only(top: 3), // Reduced from 4
+                margin: const EdgeInsets.only(top: 3),
                 width: 6,
                 height: 6,
                 decoration: const BoxDecoration(

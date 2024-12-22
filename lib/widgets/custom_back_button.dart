@@ -31,8 +31,8 @@ class CustomBackButton extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context); // Close dialog
-                    Navigator.pop(context); // Go back to previous screen
+                    Navigator.pop(context); 
+                    Navigator.pop(context); 
                   },
                   child: const Text('Quit'),
                 ),

@@ -5,7 +5,7 @@ class AnswerInputContainer extends StatelessWidget {
   final double width;
   final double height;
   final bool? isCorrect;
-  final TextStyle? textStyle; // Add textStyle parameter
+  final TextStyle? textStyle;
 
   const AnswerInputContainer({
     super.key,
@@ -13,7 +13,7 @@ class AnswerInputContainer extends StatelessWidget {
     this.width = 100,
     this.height = 60,
     this.isCorrect,
-    this.textStyle, // Initialize textStyle parameter
+    this.textStyle,
   });
 
   @override
@@ -26,7 +26,7 @@ class AnswerInputContainer extends StatelessWidget {
     return Container(
       width: width,
       height: height,
-      padding: const EdgeInsets.all(4.0), // Adjust padding
+      padding: const EdgeInsets.all(4.0),
       decoration: BoxDecoration(
         border: Border.all(color: borderColor, width: 2),
         borderRadius: BorderRadius.circular(10),
@@ -37,7 +37,7 @@ class AnswerInputContainer extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         input,
-        style: textStyle ?? const TextStyle(fontSize: 32, fontWeight: FontWeight.bold), // Use textStyle if provided
+        style: textStyle ?? const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
       ),
     );
   }

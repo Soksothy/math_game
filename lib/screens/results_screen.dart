@@ -3,7 +3,6 @@ import 'package:math_game/models/user_model.dart';
 import 'package:confetti/confetti.dart';
 import 'package:math_game/widgets/app_bar.dart';
 import 'package:math_game/widgets/bottom_navigation_bar.dart';
-import 'package:math_game/services/level_calculator.dart';
 import 'package:math_game/services/user_storage.dart';
 import 'package:math_game/widgets/animated_value.dart';
 
@@ -20,7 +19,7 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
   late Animation<double> _progressAnimation;
   int _selectedIndex = 2;
   bool _hasUpdatedStats = false;
-  int? _initialLevel; // Add this field to track initial level
+  int? _initialLevel;
 
   @override
   void initState() {
@@ -30,7 +29,6 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    // Initialize with default value
     _progressAnimation = Tween<double>(
       begin: 0.0,
       end: 0.0,
@@ -92,10 +90,7 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
   }
 
   void updateUserStats(UserModel user, String gameType, int stars, int totalQuestions) {
-    // Update topic scores with actual stars earned
     user.updateTopicScore(gameType, stars);
-    
-    // Save user data
     UserStorage.saveUser(user);
   }
 
@@ -105,27 +100,19 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
     final UserModel user = args['userModel'];
     final int stars = args['stars'] ?? 0;
     final Duration totalTime = args['totalTime'] ?? Duration.zero;
-    final int totalQuestions = args['totalQuestions'] ?? 10; // Add this line
+    final int totalQuestions = args['totalQuestions'] ?? 10;
 
-    // Store initial level on first build
     _initialLevel ??= user.level;
 
-    // Update user stats only once
     if (!_hasUpdatedStats) {
       updateUserStats(user, args['gameType'], stars, totalQuestions);
       user.stars += stars;
-      
-      // Calculate new level based on total stars
       final int newLevel = (user.stars / 10).floor() + 1;
-      
       if (newLevel > user.level) {
         user.level = newLevel;
       }
-      
       UserStorage.saveUser(user);
       _hasUpdatedStats = true;
-
-      // Update the animation's end value and restart
       _progressAnimation = Tween<double>(
         begin: 0.0,
         end: (user.stars % 10) / 10,
@@ -155,21 +142,21 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
               ),
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start, // Change from center to start
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05), // Add small top padding
+                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
                       'CONGRATULATIONS!',
                       style: TextStyle(
-                        fontSize: 35, // Reduced from 48
+                        fontSize: 35,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFFFFAF57),
                       ),
                     ),
-                    const SizedBox(height: 16), // Reduced from 24
+                    const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -200,8 +187,7 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12), // Reduced spacing
-                    // Level Progress Section
+                    const SizedBox(height: 12),
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 24),
                       padding: const EdgeInsets.all(12),
@@ -252,7 +238,7 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
                               builder: (context, child) {
                                 return LinearProgressIndicator(
                                   value: _progressAnimation.value,
-                                  minHeight: 8, // Reduced from 12
+                                  minHeight: 8,
                                   backgroundColor: Colors.grey[200],
                                   valueColor: const AlwaysStoppedAnimation<Color>(
                                     Color(0xFFFFAF57),
@@ -264,16 +250,16 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
                         ],
                       ),
                     ),
-                    const SizedBox(height: 8), // Reduced from 12
+                    const SizedBox(height: 8),
                     Image.asset(
                       leveledUp ? 'lib/asset/up_level.png' : 'lib/asset/win.png',
-                      height: 180, // Reduced from 200
+                      height: 180,
                     ),
-                    const SizedBox(height: 8), // Reduced from 12
+                    const SizedBox(height: 8),
                     Text(
                        'Great Jop, ${user.name}!',
                       style: const TextStyle(
-                        fontSize: 23, // Reduced from 32
+                        fontSize: 23,
                         color: Color(0xFF525252),
                         fontWeight: FontWeight.bold,
                       ),
@@ -283,7 +269,7 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
                       const Text(
                         'Level Up!',
                         style: TextStyle(
-                          fontSize: 28, // Reduced from 32
+                          fontSize: 28,
                           color: Color(0xFF74CF48),
                           fontWeight: FontWeight.bold,
                         ),
@@ -291,13 +277,12 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
                       Text(
                         'Level $_initialLevel → ${user.level}',
                         style: const TextStyle(
-                          fontSize: 20, // Reduced from 24
+                          fontSize: 20,
                           color: Color(0xFF525252),
                         ),
                       ),
                     ],
                     const SizedBox(height: 24),
-                    
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -306,14 +291,14 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
                           Navigator.of(context).pushNamedAndRemoveUntil(
                             '/home',
                             (route) => false,
-                            arguments: {'userModel': user}, // Pass the updated userModel
+                            arguments: {'userModel': user},
                           );
                         },
                         style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromARGB(255, 252, 189, 123),
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 36, // Reduced padding
-                          vertical: 12, // Reduced padding
+                          horizontal: 36,
+                          vertical: 12,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
@@ -327,7 +312,7 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
                         ),
                         ),
                       ),
-                      const SizedBox(width: 12), // Reduced from 16
+                      const SizedBox(width: 12),
                       ElevatedButton(
                         onPressed: () {
                           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
@@ -336,16 +321,16 @@ class _ResultsScreenState extends State<ResultsScreen> with SingleTickerProvider
                             '/game',
                             arguments: {
                               'userModel': user,
-                              'gameType': args['gameType'] ?? 'addition', // Add gameType
-                              'gameName': args['gameName'] ?? 'Sum Sprint', // Add gameName
+                              'gameType': args['gameType'] ?? 'addition',
+                              'gameName': args['gameName'] ?? 'Sum Sprint',
                             },
                           );
                         },
                         style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF74CF48),
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 36, // Reduced padding
-                          vertical: 12, // Reduced padding
+                          horizontal: 36,
+                          vertical: 12,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),

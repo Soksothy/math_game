@@ -9,7 +9,6 @@ class LevelCalculator {
   static LevelProgress calculateProgress(int totalStars) {
     const int starsPerLevel = 10;
 
-    final int currentLevel = (totalStars / starsPerLevel).floor();
     final double progress = (totalStars % starsPerLevel) / starsPerLevel;
     final bool leveledUp = (totalStars % starsPerLevel) == 0 && totalStars != 0;
 

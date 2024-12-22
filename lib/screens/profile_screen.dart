@@ -133,15 +133,9 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        selectedIndex: 1,
+        selectedIndex: 1, // Profile is always index 1
         onIndexChanged: (index) {
-          if (index != 1) {
-            Navigator.pushReplacementNamed(
-              context,
-              '/home',
-              arguments: {'userModel': user},
-            );
-          }
+          // Navigation is handled in the bottom navigation bar widget
         },
         user: user,
       ),
